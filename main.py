@@ -37,13 +37,30 @@ def sodoku():
     print_matrix(r)
 
 
-def main(name):
+def tc_r():
     A = IntSort()
     B = BoolSort()
     R = Function('R', A, A, B)
     TC_R = TransitiveClosure(R)
 
 
+def group():
+    B = BoolSort()
+    G = DeclareSort('G')
+    a = Const('a', G)
+    b = Const('b', G)
+    c = Const('c', G)
+    R = Function('R', G, G, B)
+    TR = ForAll([a, b, c], Implies(And(R(a, b), R(b, c)), R(a, c)))
+    #
+    s = Solver()
+    s.add(TR)
+    if s.check() == sat:
+        m = s.model()
+        print(m)
+    else:
+        print('unsat')
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main()
+    group()
