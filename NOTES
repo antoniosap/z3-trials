@@ -1,0 +1,14 @@
+23.9.2020
+---------
+
+DOCS:
+https://theory.stanford.edu/~nikolaj/programmingz3.html#sec-euf--equality-and-uninterpreted-functions
+https://z3prover.github.io/api/html/namespacez3py.html#a85caaab68d588c5f177e0b8725d8c533
+
+MATH:
+https://en.wikipedia.org/wiki/Group_(mathematics)
+https://en.wikipedia.org/wiki/Transitive_relation
+https://sat-smt.codes/src/
+
+BUGS:
+https://stackoverflow.com/questions/28118871/running-32-bit-z3-on-64-bit-linux-systems
