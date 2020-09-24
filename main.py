@@ -50,12 +50,12 @@ def group():
     G = DeclareSort('G')
     R = Function('R', G, G, B)
     x, y, z = Consts('x y z', G)
-    a1, a2 = Consts('a1 a2', G)
+    a1, a2, a3, a4 = Consts('a1 a2 a3 a4', G)
     s.add(ForAll([x], R(x, x)))
     s.add(ForAll([x, y], Implies(And(R(x, y), R(y, x)), x == y)))
     s.add(ForAll([x, y, z], Implies(And(R(x, y), R(y, z)), R(x, z))))
     #
-    s.add(R(a1, a2))
+    s.add(R(a1, a2), R(a3, a4))
     # solution
     r = s.check()
     print(r)
