@@ -46,20 +46,23 @@ def tc_r():
 
 def group():
     B = BoolSort()
-    G = DeclareSort('G')
-    a = Const('a', G)
-    b = Const('b', G)
-    c = Const('c', G)
-    R = Function('R', G, G, B)
-    TR = ForAll([a, b, c], Implies(And(R(a, b), R(b, c)), R(a, c)))
-    #
     s = Solver()
-    s.add(TR)
-    if s.check() == sat:
+    G = DeclareSort('G')
+    R = Function('R', G, G, B)
+    x, y, z = Consts('x y z', G)
+    a1, a2 = Consts('a1 a2', G)
+    s.add(ForAll([x], R(x, x)))
+    s.add(ForAll([x, y], Implies(And(R(x, y), R(y, x)), x == y)))
+    s.add(ForAll([x, y, z], Implies(And(R(x, y), R(y, z)), R(x, z))))
+    #
+    s.add(R(a1, a2))
+    # solution
+    r = s.check()
+    print(r)
+    if r == sat:
         m = s.model()
         print(m)
-    else:
-        print('unsat')
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
