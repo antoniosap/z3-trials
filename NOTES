@@ -16,5 +16,17 @@ https://en.wikipedia.org/wiki/Group_(mathematics)
 https://en.wikipedia.org/wiki/Transitive_relation
 https://sat-smt.codes/src/
 
+PACKAGES:
+https://packages.gentoo.org/categories/sci-mathematics
+https://en.wikipedia.org/wiki/Automated_theorem_proving
+https://en.wikipedia.org/wiki/Satisfiability_modulo_theories#Solvers
+https://z3string.github.io/
+https://zyh1121.github.io/z3str3Docs/inputLanguage.html
+https://www.cl.cam.ac.uk/research/hvg/HOL/history.html
+https://staff.washington.edu/jon/flip/www/
+
+ALGEBRA:
+https://www.gap-system.org/
+
 BUGS:
 https://stackoverflow.com/questions/28118871/running-32-bit-z3-on-64-bit-linux-systems
