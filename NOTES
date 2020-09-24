@@ -5,6 +5,9 @@ DOCS:
 https://theory.stanford.edu/~nikolaj/programmingz3.html#sec-euf--equality-and-uninterpreted-functions
 https://z3prover.github.io/api/html/namespacez3py.html#a85caaab68d588c5f177e0b8725d8c533
 
+TPTP PROBLEMS:
+http://www.tptp.org/
+
 CODE:
 https://github.com/Z3Prover/doc/tree/master/programmingz3/code
 
