@@ -1,7 +1,7 @@
 # 23.9.2020
 
 from z3 import *
-
+import angr
 
 def sodoku():
     X = [[Int("x_%s_%s" % (i + 1, j + 1)) for j in range(9)]
@@ -64,6 +64,10 @@ def group():
         print(m)
 
 
+def angr_workbench():
+    proj = angr.Project('/bin/nano')
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    group()
+    angr_workbench()
