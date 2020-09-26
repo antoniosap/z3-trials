@@ -64,6 +64,20 @@ def tr():
         print(m)
 
 
-# Press the green button in the gutter to run the script.
+def hanoi():
+    ROWS = 4
+    COLS = 3
+    STEPS = ROWS * COLS
+    s = Solver()
+    X = [[Int("x_r%d_c%d" % (i + 1, j + 1)) for j in range(COLS)] for i in range(ROWS)]
+    op = [Int('op_%d' % n) for n in range(STEPS)]
+    #
+    #
+    #
+    #
+    print(X)
+    print(op)
+
+
 if __name__ == '__main__':
-    tr()
+    hanoi()
