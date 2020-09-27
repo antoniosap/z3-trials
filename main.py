@@ -119,5 +119,71 @@ def hanoi():
     #    print(m)
 
 
+def alphametics():
+    # VIOLIN + VIOLIN + VIOLA = TRIO + SONATA
+    A, I, L, N, O, R, S, T, V = Ints('A, I, L, N, O, R, S, T, V')
+    s = Solver()
+    s.add( Distinct (A, I, L, N, O, R, S, T, V))
+    s.add(And(A >= 0, A <= 9))
+    s.add(And(I >= 0, I <= 9))
+    s.add(And(L >= 0, L <= 9))
+    s.add(And(N >= 0, N <= 9))
+    s.add(And(O >= 0, O <= 9))
+    s.add(And(R >= 0, R <= 9))
+    s.add(And(S >= 0, S <= 9))
+    s.add(And(T >= 0, T <= 9))
+    s.add(And(V >= 0, V <= 9))
+    VIOLIN, VIOLA, SONATA, TRIO = Ints('VIOLIN VIOLA SONATA TRIO')
+    s.add(VIOLIN == 100000 * V + 10000 * I + 1000 * O + 100 * L + 10 * I + N)
+    s.add(VIOLA == 10000 * V + 1000 * I + 100 * O + 10 * L + A)
+    s.add(SONATA == 100000 * S + 10000 * O + 1000 * N + 100 * A + 10 * T + A)
+    s.add(TRIO == 1000 * T + 100 * R + 10 * I + O)
+    s.add(VIOLIN + VIOLIN + VIOLA == TRIO + SONATA)
+    # solution
+    r = s.check()
+    print(r)
+    if r == sat:
+        m = s.model()
+        print(m)
+        print(m[VIOLIN].as_long() + m[VIOLIN].as_long() + m[VIOLA].as_long())
+        print(m[TRIO].as_long()+m[SONATA].as_long())
+
+
+def alphametics_2():
+    C, O, N, T, E, D, I, M, A, R, S, L, U = Ints('C O N T E D I M A R S L U')
+    s = Solver()
+    s.add(Distinct(C, O, N, T, E, D, I, M, A, R, S, L, U))
+    s.add(And(C >= 0, C <= 9))
+    s.add(And(O >= 0, O <= 9))
+    s.add(And(N >= 0, N <= 9))
+    s.add(And(T >= 0, T <= 9))
+    s.add(And(E >= 0, E <= 9))
+    s.add(And(D >= 0, D <= 9))
+    s.add(And(I >= 0, I <= 9))
+    s.add(And(M >= 0, M <= 9))
+    s.add(And(A >= 0, A <= 9))
+    s.add(And(R >= 0, R <= 9))
+    s.add(And(S >= 0, S <= 9))
+    s.add(And(L >= 0, L <= 9))
+    s.add(And(U >= 0, U <= 9))
+    CONTE, DIMAIO, TRIDICO, MERDA, DI, CULO = Ints('CONTE DIMAIO TRIDICO MERDA DI CULO')
+    s.add(CONTE == 10000 * C + 1000 * O + 100 * N + 10 * T + 1 * E)
+    s.add(DIMAIO == 100000 * D + 10000 * I + 1000 * M + 100 * A + 10 * I + 1 * O)
+    s.add(TRIDICO == 1000000 * T + 100000 * R + 10000 * I + 1000 * D + 100 * I + 10 * C + 1 * O)
+    s.add(MERDA == 10000 * M + 1000 * E + 100 * R + 10 * D + 1 * A)
+    s.add(DI == 10 * D + 1 * I)
+    s.add(CULO == 1000 * C + 100 * U + 10 * L + 1 * O)
+    s.add(CONTE + DIMAIO + TRIDICO == MERDA + DI + CULO)
+    # solution
+    r = s.check()
+    print(r)
+    if r == sat:
+        m = s.model()
+        print(m)
+        print(m[CONTE].as_long() + m[DIMAIO].as_long() + m[TRIDICO].as_long())
+        print(m[MERDA].as_long()+m[DI].as_long()+m[CULO].as_long())
+
+
 if __name__ == '__main__':
-    hanoi()
+    # hanoi()
+    alphametics_2()
