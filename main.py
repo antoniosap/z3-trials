@@ -105,16 +105,16 @@ def hanoi():
     # init state
     for i in range(4):
         if i in stack[0]:
-            L |= 2**i
+            L |= 2 ** i
         if i in stack[1]:
-            C |= 2**i
+            C |= 2 ** i
         if i in stack[2]:
-            R |= 2**i
+            R |= 2 ** i
     #
     # solution
-    #r = s.check()
-    #print(r)
-    #if r == sat:
+    # r = s.check()
+    # print(r)
+    # if r == sat:
     #    m = s.model()
     #    print(m)
 
@@ -123,7 +123,7 @@ def alphametics():
     # VIOLIN + VIOLIN + VIOLA = TRIO + SONATA
     A, I, L, N, O, R, S, T, V = Ints('A, I, L, N, O, R, S, T, V')
     s = Solver()
-    s.add( Distinct (A, I, L, N, O, R, S, T, V))
+    s.add(Distinct(A, I, L, N, O, R, S, T, V))
     s.add(And(A >= 0, A <= 9))
     s.add(And(I >= 0, I <= 9))
     s.add(And(L >= 0, L <= 9))
@@ -146,44 +146,107 @@ def alphametics():
         m = s.model()
         print(m)
         print(m[VIOLIN].as_long() + m[VIOLIN].as_long() + m[VIOLA].as_long())
-        print(m[TRIO].as_long()+m[SONATA].as_long())
+        print(m[TRIO].as_long() + m[SONATA].as_long())
 
 
-def alphametics_2():
-    C, O, N, T, E, D, I, M, A, R, S, L, U = Ints('C O N T E D I M A R S L U')
+def char_to_idx(c):
+    return ord(c) - ord('A')
+
+
+def idx_to_char(i):
+    return chr(ord('A') + i)
+
+
+# construct expression in form like:
+# 10000000*L+1000000*U+100000*N+10000*C+1000*H+100*E+10*O+N
+def list_to_expr(lst):
+    coeff = 1
+    _sum = 0
+    for var in lst[::-1]:
+        _sum = _sum + var * coeff
+        coeff = coeff * 10
+    return _sum
+
+
+def alphametics_gen():
+    # this table has 10 items, it reflects character for each number:
+    digits = [Int('digit_%d' % i) for i in range(10)]
+
+    # this is "reverse" table, it has value for each letter:
+    letters = [Int('letter_%d' % i) for i in range(26)]
+
     s = Solver()
-    s.add(Distinct(C, O, N, T, E, D, I, M, A, R, S, L, U))
-    s.add(And(C >= 0, C <= 9))
-    s.add(And(O >= 0, O <= 9))
-    s.add(And(N >= 0, N <= 9))
-    s.add(And(T >= 0, T <= 9))
-    s.add(And(E >= 0, E <= 9))
-    s.add(And(D >= 0, D <= 9))
-    s.add(And(I >= 0, I <= 9))
-    s.add(And(M >= 0, M <= 9))
-    s.add(And(A >= 0, A <= 9))
-    s.add(And(R >= 0, R <= 9))
-    s.add(And(S >= 0, S <= 9))
-    s.add(And(L >= 0, L <= 9))
-    s.add(And(U >= 0, U <= 9))
-    CONTE, DIMAIO, TRIDICO, MERDA, DI, CULO = Ints('CONTE DIMAIO TRIDICO MERDA DI CULO')
-    s.add(CONTE == 10000 * C + 1000 * O + 100 * N + 10 * T + 1 * E)
-    s.add(DIMAIO == 100000 * D + 10000 * I + 1000 * M + 100 * A + 10 * I + 1 * O)
-    s.add(TRIDICO == 1000000 * T + 100000 * R + 10000 * I + 1000 * D + 100 * I + 10 * C + 1 * O)
-    s.add(MERDA == 10000 * M + 1000 * E + 100 * R + 10 * D + 1 * A)
-    s.add(DI == 10 * D + 1 * I)
-    s.add(CULO == 1000 * C + 100 * U + 10 * L + 1 * O)
-    s.add(CONTE + DIMAIO + TRIDICO == MERDA + DI + CULO)
+
+    # all items in digits[] table must be distinct, because no two letters can share same number:
+    s.add(Distinct(digits))
+
+    # all numbers are in 0..25 range, because each number in this table defines character:
+    for i in range(10):
+        s.add(And(digits[i] >= 0, digits[i] < 26))
+
+    # define "reverse" table.
+    # letters[i] is 0..9, depending on which digits[] item contains this letter:
+    for i in range(26):
+        s.add(letters[i] ==
+              If(digits[0] == i, 0,
+                 If(digits[1] == i, 1,
+                    If(digits[2] == i, 2,
+                       If(digits[3] == i, 3,
+                          If(digits[4] == i, 4,
+                             If(digits[5] == i, 5,
+                                If(digits[6] == i, 6,
+                                   If(digits[7] == i, 7,
+                                      If(digits[8] == i, 8,
+                                         If(digits[9] == i, 9, 99999999)))))))))))
+
+    # the last word is "sum" all the rest are "addends":
+
+    words = ['MERLO', 'PIPPA', 'VENDUTO', 'CIPPA', 'BACATO', 'PUPAZZO', 'PAGLIACCIO', 'BUFFONE', 'PINOCCHIO', 'FETENTE', 'PICIU', 'MONA',
+             'CIUMMELLO', 'DRACULA', 'CORNUTO', 'ASSASSINO', 'PREZZOLATO', 'BARACCONE', 'PORCO', 'CUCCO', 'CANAGLIA', 'SEDANO', 'CARCIOFO',
+             'ZOZZONE', 'PIRLA', 'ZOCCOLA', 'ZIMBELLO', 'MERDACCIA', 'FINOCCHIO', 'BAVOSO', 'TRADITORE', 'INDEGNO',
+             'AZZOLINA']
+
+    words_total = len(words)
+
+    word = [Int('word_%d' % i) for i in range(words_total)]
+    word_used = [Bool('word_used_%d' % i) for i in range(words_total)]
+
+    # last word is always used:
+    s.add(word_used[words_total - 1] == True)
+
+    # s.add(word_used[words.index('CAKE')])
+    # s.add(word_used[words.index('ZINGARETTI')])
+
+    for i in range(words_total):
+        # get list of letters for the word:
+        lst = [letters[char_to_idx(c)] for c in words[i]]
+        # construct expression for letters. it must be equal to the value of the word:
+        s.add(word[i] == list_to_expr(lst))
+        # if word_used, word's value must be less than 99999999, i.e., all letters are used in the word:
+        s.add(If(word_used[i], word[i], 0) < 99999999)
+
+    # if word_used, add value of word to the whole expression
+    expr = [If(word_used[i], word[i], 0) for i in range(words_total - 1)]
+    # sum up all items in expression. sum must be equal to the value of the last word:
+    s.add(sum(expr) == word[-1])
+
     # solution
     r = s.check()
     print(r)
     if r == sat:
         m = s.model()
         print(m)
-        print(m[CONTE].as_long() + m[DIMAIO].as_long() + m[TRIDICO].as_long())
-        print(m[MERDA].as_long()+m[DI].as_long()+m[CULO].as_long())
+        for i in range(words_total):
+            # if word_used, print it:
+            if str(m[word_used[i]]) == "True" or i + 1 == words_total:
+                print(words[i])
+
+        for i in range(26):
+            # it letter is used, print it:
+            if m[letters[i]].as_long() != 99999999:
+                print(idx_to_char(i), m[letters[i]])
 
 
 if __name__ == '__main__':
     # hanoi()
-    alphametics_2()
+    alphametics_gen()
