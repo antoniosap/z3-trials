@@ -64,7 +64,7 @@ def tr():
         print(m)
 
 
-def move_check(state: list, col_a: int, col_b: int) -> bool:
+def move_check(state, col_a, col_b):
     if len(state[col_a]) == 0:
         return False
     if len(state[col_b]) > 0:
@@ -73,7 +73,7 @@ def move_check(state: list, col_a: int, col_b: int) -> bool:
         return True
 
 
-def move_op(state: list, col_a: int, col_b: int) -> None:
+def move_op(state, col_a, col_b):
     if move_check(state, col_a, col_b):
         el = min(state[col_a])
         state[col_a].remove(el)
@@ -85,7 +85,7 @@ move_names = ["MOVE 1 -> 2", "MOVE 2 -> 1",
               "MOVE 2 -> 3", "MOVE 3 -> 2"]
 
 
-def move(state: list, op: int):
+def move(state, op):
     return If(op == 0, move_op(state, 0, 1),
               If(op == 1, move_op(state, 1, 0),
                  If(op == 2, move_op(state, 0, 2),
