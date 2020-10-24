@@ -204,7 +204,7 @@ def alphametics_gen():
     words = ['MERLO', 'PIPPA', 'VENDUTO', 'CIPPA', 'BACATO', 'PUPAZZO', 'PAGLIACCIO', 'BUFFONE', 'PINOCCHIO', 'FETENTE', 'PICIU', 'MONA',
              'CIUMMELLO', 'DRACULA', 'CORNUTO', 'ASSASSINO', 'PREZZOLATO', 'BARACCONE', 'PORCO', 'CUCCO', 'CANAGLIA', 'SEDANO', 'CARCIOFO',
              'ZOZZONE', 'PIRLA', 'ZOCCOLA', 'ZIMBELLO', 'MERDACCIA', 'FINOCCHIO', 'BAVOSO', 'TRADITORE', 'INDEGNO',
-             'AZZOLINA']
+             'ALLUPATO', 'DROGATO', 'DELUCA']
 
     words_total = len(words)
 
@@ -248,5 +248,7 @@ def alphametics_gen():
 
 
 if __name__ == '__main__':
+    set_param('parallel.enable', True)
+    # set_param(proof=True)
     # hanoi()
     alphametics_gen()
