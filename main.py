@@ -120,6 +120,7 @@ def hanoi():
 
 
 def alphametics():
+    set_param(proof=True)
     # VIOLIN + VIOLIN + VIOLA = TRIO + SONATA
     A, I, L, N, O, R, S, T, V = Ints('A, I, L, N, O, R, S, T, V')
     s = Solver()
@@ -147,6 +148,7 @@ def alphametics():
         print(m)
         print(m[VIOLIN].as_long() + m[VIOLIN].as_long() + m[VIOLA].as_long())
         print(m[TRIO].as_long() + m[SONATA].as_long())
+        print(s.proof())
 
 
 def char_to_idx(c):
@@ -252,3 +254,4 @@ if __name__ == '__main__':
     # set_param(proof=True)
     # hanoi()
     alphametics_gen()
+    # alphametics()
