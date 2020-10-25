@@ -5,8 +5,12 @@
 
 from z3 import *
 
-X = [[Int("x_%s_%s" % (i + 1, j + 1)) for j in range(4)]
-     for i in range(4)]
+MOVES = 2
+
+X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, k + 1))
+       for j in range(4)]
+      for i in range(4)]
+     for k in range(MOVES)]
 
 
 def g15():
@@ -20,22 +24,22 @@ def g15():
                    (9, 10, 11, 12),
                    (13, 14, 15, 0))
 
-    cells_c = [And(0 <= X[i][j], X[i][j] <= 15) for i in range(4) for j in range(4)]
-    distinct_c = [Distinct([X[i][j] for i in range(4) for j in range(4)])]
-    final_state_c = [X[i][j] == final_state[i][j] for i in range(4) for j in range(4)]
-    # c_state = [If(init_state[i][j] == 0, True, X[i][j] == init_state[i][j])
-    #           for i in range(4) for j in range(4)]
+    cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(MOVES)]
+    distinct_c = [Distinct([X[k][i][j] for i in range(4) for j in range(4) for k in range(MOVES)])]
+    final_state_c = [X[0][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
+    init_state_c = [X[MOVES - 1][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
 
     s = Solver()
-    s.add(cells_c + distinct_c + final_state_c)
+    s.add(cells_c + distinct_c + init_state_c + final_state_c)
     r = s.check()
     print(r)
     if r == sat:
         m = s.model()
         print(m)
-        v = [[m.evaluate(X[i][j]) for j in range(4)]
-             for i in range(4)]
-        print(v)
+        ev = [[[m.evaluate(X[k][i][j]) for j in range(4)]
+               for i in range(4)]
+              for k in range(MOVES)]
+        print(ev)
 
 
 def move_down(row, col):
