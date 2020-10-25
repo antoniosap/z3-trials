@@ -5,12 +5,12 @@
 
 from z3 import *
 
-MOVES = 2
+BOARDS = 2
 
 X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, k + 1))
        for j in range(4)]
       for i in range(4)]
-     for k in range(MOVES)]
+     for k in range(BOARDS)]
 
 
 def g15():
@@ -24,10 +24,10 @@ def g15():
                    (9, 10, 11, 12),
                    (13, 14, 15, 0))
 
-    cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(MOVES)]
-    distinct_c = [Distinct([X[k][i][j] for i in range(4) for j in range(4) for k in range(MOVES)])]
+    cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(BOARDS)]
+    distinct_c = [Distinct([X[k][i][j] for i in range(4) for j in range(4) for k in range(BOARDS)])]
     final_state_c = [X[0][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
-    init_state_c = [X[MOVES - 1][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
+    init_state_c = [X[BOARDS - 1][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c)
@@ -38,44 +38,48 @@ def g15():
         print(m)
         ev = [[[m.evaluate(X[k][i][j]) for j in range(4)]
                for i in range(4)]
-              for k in range(MOVES)]
+              for k in range(BOARDS)]
         print(ev)
 
 
-def move_down(row, col):
-    if row < 3:
-        X[row + 1, col] = X[row, col]
-        X[row, col] = 0
-        return True
+def move_down(board, row, col):
+    def move(board, row, col):
+        return [X[board - 1][row + 1][col] == X[board][row][col], X[board - 1][row][col] == 0]
+
+    if board > 0 and row < 3:
+        return [If(X[board - 1][row + 1][col] == 0, move(board, row, col), [])]
     else:
-        return False
+        return []
 
 
 def move_up(row, col):
-    if row > 0:
-        X[row - 1, col] = X[row, col]
-        X[row, col] = 0
-        return True
+    def move(board, row, col):
+        return [X[board - 1][row - 1][col] == X[board][row][col], X[board - 1][row][col] == 0]
+
+    if board > 0 and row > 0:
+        return [If(X[board - 1][row - 1][col] == 0, move(board, row, col), [])]
     else:
-        return False
+        return []
 
 
 def move_left(row, col):
-    if col > 0:
-        X[row, col - 1] = X[row, col]
-        X[row, col] = 0
-        return True
+    def move(board, row, col):
+        return [X[board - 1][row][col - 1] == X[board][row][col], X[board - 1][row][col] == 0]
+
+    if board > 0 and col > 0:
+        return [If(X[board - 1][row][col - 1] == 0, move(board, row, col), [])]
     else:
-        return False
+        return []
 
 
 def move_right(row, col):
-    if col < 3:
-        X[row, col + 1] = X[row, col]
-        X[row, col] = 0
-        return True
+    def move(board, row, col):
+        return [X[board - 1][row][col + 1] == X[board][row][col], X[board - 1][row][col] == 0]
+
+    if board > 0 and col < 3:
+        return [If(X[board - 1][row][col + 1] == 0, move(board, row, col), [])]
     else:
-        return False
+        return []
 
 
 def move_check(state, col_a, col_b):
