@@ -24,6 +24,9 @@ final_state = ((1, 2, 3, 4),
                (9, 10, 11, 12),
                (13, 14, 15, 0))
 
+current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
+
+
 def g15():
     cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(BOARDS)]
     distinct_c = [Distinct([X[k][i][j] for i in range(4) for j in range(4) for k in range(BOARDS)])]
@@ -94,7 +97,8 @@ def move_tile(op, board, row, col):
               If(op == MOVE_UP, move_up(board, row, col),
                  If(op == MOVE_LEFT, move_left(board, row, col),
                     If(op == MOVE_RIGHT, move_right(board, row, col),
-                          move_null()))))
+                       move_null()))))
+
 
 def g15_display(s):
     print("|----|----|----|----|")
@@ -109,6 +113,21 @@ def g15_display(s):
     print()
 
 
+def g15_find_hole(s):
+    for r in range(4):
+        for c in range(4):
+            if s[r][c] == 0:
+                return r, c
+
+
+def g15_move_down(s):
+    r, c = g15_find_hole(s)
+    if r > 0:
+        s[r][c] = s[r - 1][c]
+        s[r - 1][c] = 0
+    return s
+
+
 class App(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -118,25 +137,24 @@ class App(tk.Frame):
         self.left_pad = tk.Button(self, text="L <--", command=self.move_left).pack(side="left")
         self.right_pad = tk.Button(self, text="--> R", command=self.move_right).pack(side="right")
         self.bot_pad = tk.Button(self, text="|||\nBOT", command=self.move_bottom).pack(side="bottom")
-
-    def display_status(self):
-        g15_display(init_state)
+        g15_display(current_state)
 
     def move_top(self):
         print("MOVE TOP")
-        self.display_status()
+        g15_display(current_state)
 
     def move_bottom(self):
         print("MOVE BOTTOM")
-        self.display_status()
+        g15_move_down(current_state)
+        g15_display(current_state)
 
     def move_left(self):
         print("MOVE LEFT")
-        self.display_status()
+        g15_display(current_state)
 
     def move_right(self):
         print("MOVE RIGHT")
-        self.display_status()
+        g15_display(current_state)
 
 
 if __name__ == '__main__':
