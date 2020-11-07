@@ -114,14 +114,10 @@ class App(tk.Frame):
         super().__init__(master)
         self.master = master
         self.pack()
-        self.top_pad = tk.Button(self, text="TOP\n|||", command=self.move_top)
-        self.top_pad.pack(side="top")
-        self.left_pad = tk.Button(self, text="L <--", command=self.move_left)
-        self.left_pad.pack(side="left")
-        self.right_pad = tk.Button(self, text="--> R", command=self.move_right)
-        self.right_pad.pack(side="right")
-        self.bot_pad = tk.Button(self, text="|||\nBOT", command=self.move_bottom)
-        self.bot_pad.pack(side="bottom")
+        self.top_pad = tk.Button(self, text="TOP\n|||", command=self.move_top).pack(side="top")
+        self.left_pad = tk.Button(self, text="L <--", command=self.move_left).pack(side="left")
+        self.right_pad = tk.Button(self, text="--> R", command=self.move_right).pack(side="right")
+        self.bot_pad = tk.Button(self, text="|||\nBOT", command=self.move_bottom).pack(side="bottom")
 
     def display_status(self):
         g15_display(init_state)
