@@ -114,17 +114,33 @@ class App(tk.Frame):
         super().__init__(master)
         self.master = master
         self.pack()
-        self.hi_there = tk.Button(self)
-        self.hi_there["text"] = "DISPLAY"
-        self.hi_there["command"] = self.display_status
-        self.hi_there.pack(side="top")
-
-        self.quit = tk.Button(self, text="QUIT", fg="red",
-                              command=self.master.destroy)
-        self.quit.pack(side="bottom")
+        self.top_pad = tk.Button(self, text="TOP\n|||", command=self.move_top)
+        self.top_pad.pack(side="top")
+        self.left_pad = tk.Button(self, text="L <--", command=self.move_left)
+        self.left_pad.pack(side="left")
+        self.right_pad = tk.Button(self, text="--> R", command=self.move_right)
+        self.right_pad.pack(side="right")
+        self.bot_pad = tk.Button(self, text="|||\nBOT", command=self.move_bottom)
+        self.bot_pad.pack(side="bottom")
 
     def display_status(self):
         g15_display(init_state)
+
+    def move_top(self):
+        print("MOVE TOP")
+        self.display_status()
+
+    def move_bottom(self):
+        print("MOVE BOTTOM")
+        self.display_status()
+
+    def move_left(self):
+        print("MOVE LEFT")
+        self.display_status()
+
+    def move_right(self):
+        print("MOVE RIGHT")
+        self.display_status()
 
 
 if __name__ == '__main__':
