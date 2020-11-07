@@ -128,6 +128,30 @@ def g15_move_down(s):
     return s
 
 
+def g15_move_up(s):
+    r, c = g15_find_hole(s)
+    if r < 3:
+        s[r][c] = s[r + 1][c]
+        s[r + 1][c] = 0
+    return s
+
+
+def g15_move_left(s):
+    r, c = g15_find_hole(s)
+    if c < 3:
+        s[r][c] = s[r][c + 1]
+        s[r][c + 1] = 0
+    return s
+
+
+def g15_move_right(s):
+    r, c = g15_find_hole(s)
+    if c > 0:
+        s[r][c] = s[r][c - 1]
+        s[r][c - 1] = 0
+    return s
+
+
 class App(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -141,6 +165,7 @@ class App(tk.Frame):
 
     def move_top(self):
         print("MOVE TOP")
+        g15_move_up(current_state)
         g15_display(current_state)
 
     def move_bottom(self):
@@ -150,10 +175,12 @@ class App(tk.Frame):
 
     def move_left(self):
         print("MOVE LEFT")
+        g15_move_left(current_state)
         g15_display(current_state)
 
     def move_right(self):
         print("MOVE RIGHT")
+        g15_move_right(current_state)
         g15_display(current_state)
 
 
