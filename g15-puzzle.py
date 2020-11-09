@@ -21,19 +21,29 @@ init_state = ((1, 2, 3, 4),
 
 final_state = ((1, 2, 3, 4),
                (5, 6, 7, 8),
-               (9, 10, 11, 12),
-               (13, 14, 15, 0))
+               (9, 10, 12, 15),
+               (13, 14, 11, 0))
 
 current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
 
 
 def g15():
+    set_param('parallel.enable', True)
     cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(BOARDS)]
-    distinct_c = [Distinct([X[k][i][j] for i in range(4) for j in range(4) for k in range(BOARDS)])]
-    final_state_c = [X[0][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
-    init_state_c = [X[BOARDS - 1][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
+    distinct_c = []
+    for k in range(BOARDS - 1):
+        distinct_c.append(Distinct([X[k][i][j] for i in range(4) for j in range(4)]))
+    final_state_c = [X[BOARDS - 1][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
+    init_state_c = [X[0][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
     op = [Int('op_%d' % n) for n in range(BOARDS - 1)]
-    moves_c = [X[k - 1][i][j] == move_tile(op[k], X, i, j) for i in range(4) for j in range(4) for k in range(BOARDS)]
+    # moves_c = [X[k - 1][i][j] == move_tile(op[k], k, i, j) for i in range(4) for j in range(4) for k in range(BOARDS - 1)]
+    # moves_c = [Or(move_down(1, 2, 3), move_up(1, 2, 3), move_right(1, 2, 3))]
+    # moves_c = move_down(1, 2, 3)
+    moves_c = []
+    # le tessere senza il buco e senza buchi nell intorno, sono fisse
+    fixed_c = []
+    for k in range(BOARDS - 1):
+        pass
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + moves_c)
@@ -100,6 +110,8 @@ def move_tile(op, board, row, col):
                        move_null()))))
 
 
+# ----------------------------------------------------------------------------------------------------
+
 def g15_display(s):
     print("|----|----|----|----|")
     print("| {:2d} | {:2d} | {:2d} | {:2d} |".format(s[0][0], s[0][1], s[0][2], s[0][3]).replace(' 0 ', '   '))
@@ -161,7 +173,11 @@ class App(tk.Frame):
         self.left_pad = tk.Button(self, text="L <--", command=self.move_left).pack(side="left")
         self.right_pad = tk.Button(self, text="--> R", command=self.move_right).pack(side="right")
         self.bot_pad = tk.Button(self, text="|||\nBOT", command=self.move_bottom).pack(side="bottom")
-        g15_display(current_state)
+        self.go_pad = tk.Button(self, text="*** GO ***", command=g15).pack(side="bottom")
+        print("INITIAL STATE")
+        g15_display(init_state)
+        print("FINAL STATE")
+        g15_display(final_state)
 
     def move_top(self):
         print("MOVE TOP")
@@ -185,8 +201,6 @@ class App(tk.Frame):
 
 
 if __name__ == '__main__':
-    set_param('parallel.enable', True)
-    # g15()
     root = tk.Tk()
     root.geometry("+1000+100")
     app = App(master=root)
