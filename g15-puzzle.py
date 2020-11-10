@@ -43,10 +43,10 @@ def g15():
     # le tessere senza il buco e senza buchi nell intorno, sono fisse
     fixed_c = []
     for k in range(BOARDS - 1):
-        pass
+        fixed_c.append(And(X[k][0][0] > 0, X[k + 1][0][0] > 0, X[k][0][0] == X[k + 1][0][0]))
 
     s = Solver()
-    s.add(cells_c + distinct_c + init_state_c + final_state_c + moves_c)
+    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c)
     r = s.check()
     print(r)
     if r == sat:
