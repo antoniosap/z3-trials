@@ -40,10 +40,33 @@ def g15():
     # moves_c = [Or(move_down(1, 2, 3), move_up(1, 2, 3), move_right(1, 2, 3))]
     # moves_c = move_down(1, 2, 3)
     moves_c = []
-    # le tessere senza il buco e senza buchi nell intorno, sono fisse
+    # le tessere senza il buco e senza buchi nell intorno, non si muovono
     fixed_c = []
     for k in range(BOARDS - 1):
-        fixed_c.append(And(X[k][0][0] > 0, X[k + 1][0][0] > 0, X[k][0][0] == X[k + 1][0][0]))
+        # quadrante NWW
+        fixed_c.append(And(X[k][0][0] > 0, X[k + 1][0][0] > 0, X[k][0][0] == X[k + 1][0][0],
+                           X[k][0][1] > 0, X[k + 1][0][1] > 0, X[k][0][1] == X[k + 1][0][1],
+                           X[k][1][0] > 0, X[k + 1][1][0] > 0, X[k][1][0] == X[k + 1][1][0],
+                           X[k][1][1] > 0, X[k + 1][1][1] > 0, X[k][1][1] == X[k + 1][1][1]))
+        # quadrante NW
+        fixed_c.append(And(X[k][0][0] > 0, X[k + 1][0][0] > 0, X[k][0][0] == X[k + 1][0][0],
+                           X[k][0][1] > 0, X[k + 1][0][1] > 0, X[k][0][1] == X[k + 1][0][1],
+                           X[k][0][2] > 0, X[k + 1][0][2] > 0, X[k][0][2] == X[k + 1][0][2],
+                           X[k][1][0] > 0, X[k + 1][1][0] > 0, X[k][1][0] == X[k + 1][1][0],
+                           X[k][1][1] > 0, X[k + 1][1][1] > 0, X[k][1][1] == X[k + 1][1][1],
+                           X[k][1][2] > 0, X[k + 1][1][2] > 0, X[k][1][2] == X[k + 1][1][2]))
+        # quadrante NE
+        fixed_c.append(And(X[k][0][1] > 0, X[k + 1][0][1] > 0, X[k][0][1] == X[k + 1][0][1],
+                           X[k][0][2] > 0, X[k + 1][0][2] > 0, X[k][0][2] == X[k + 1][0][2],
+                           X[k][0][3] > 0, X[k + 1][0][3] > 0, X[k][0][3] == X[k + 1][0][3],
+                           X[k][1][1] > 0, X[k + 1][1][1] > 0, X[k][1][1] == X[k + 1][1][1],
+                           X[k][1][2] > 0, X[k + 1][1][2] > 0, X[k][1][2] == X[k + 1][1][2],
+                           X[k][1][3] > 0, X[k + 1][1][3] > 0, X[k][1][3] == X[k + 1][1][3]))
+        # quadrante NEE
+        fixed_c.append(And(X[k][0][2] > 0, X[k + 1][0][2] > 0, X[k][0][2] == X[k + 1][0][2],
+                           X[k][0][3] > 0, X[k + 1][0][3] > 0, X[k][0][3] == X[k + 1][0][3],
+                           X[k][1][2] > 0, X[k + 1][1][2] > 0, X[k][1][2] == X[k + 1][1][2],
+                           X[k][1][3] > 0, X[k + 1][1][3] > 0, X[k][1][3] == X[k + 1][1][3]))
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c)
