@@ -33,7 +33,7 @@ def g15():
     set_param(verbose=1)
     cells_c = [And(0 <= X[k][i][j], X[k][i][j] <= 15) for j in range(4) for i in range(4) for k in range(BOARDS)]
     distinct_c = []
-    for k in range(BOARDS - 1):
+    for k in range(BOARDS):
         distinct_c.append(Distinct([X[k][i][j] for i in range(4) for j in range(4)]))
     final_state_c = [X[BOARDS - 1][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
     init_state_c = [X[0][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
@@ -201,12 +201,19 @@ def g15():
         # 1 | _, _, _, _
         # 2 | _,10,11,12
         # 3 | _,14,15,16
-        fixed_c.append(And(X[k][2][1] > 0, X[k + 1][2][1] > 0, X[k][2][1] == X[k + 1][2][1],
-                           X[k][2][2] > 0, X[k + 1][2][2] > 0, X[k][2][2] == X[k + 1][2][2],
-                           X[k][2][3] > 0, X[k + 1][2][3] > 0, X[k][2][3] == X[k + 1][2][3],
-                           X[k][3][1] > 0, X[k + 1][3][1] > 0, X[k][3][1] == X[k + 1][3][1],
-                           X[k][3][2] > 0, X[k + 1][3][2] > 0, X[k][3][2] == X[k + 1][3][2]))
-        #                  X[k][3][3] > 0, X[k + 1][3][3] > 0, X[k][3][3] == X[k + 1][3][3]))
+        fixed_c.append(If(And(X[k][2][1] > 0, X[k + 1][2][1] > 0,
+                              X[k][2][2] > 0, X[k + 1][2][2] > 0,
+                              X[k][2][3] > 0, X[k + 1][2][3] > 0,
+                              X[k][3][1] > 0, X[k + 1][3][1] > 0,
+                              X[k][3][2] > 0, X[k + 1][3][2] > 0,
+                              X[k][3][3] > 0, X[k + 1][3][3] > 0),
+                          And(X[k][2][1] == X[k + 1][2][1],     # then
+                              X[k][2][2] == X[k + 1][2][2],
+                              X[k][2][3] == X[k + 1][2][3],
+                              X[k][3][1] == X[k + 1][3][1],
+                              X[k][3][2] == X[k + 1][3][2],
+                              X[k][3][3] == X[k + 1][3][3]),
+                          True))    # else
         # # quadrante SEE
         #   | 0  1  2  3
         # --|-----------
@@ -214,10 +221,15 @@ def g15():
         # 1 | _, _, _, _
         # 2 | _, _,11,12
         # 3 | _, _,15,16
-        fixed_c.append(And(X[k][2][2] > 0, X[k + 1][2][2] > 0, X[k][2][2] == X[k + 1][2][2],
-                           X[k][2][3] > 0, X[k + 1][2][3] > 0, X[k][2][3] == X[k + 1][2][3],
-                           X[k][3][2] > 0, X[k + 1][3][2] > 0, X[k][3][2] == X[k + 1][3][2]))
-        #                  X[k][3][3] > 0, X[k + 1][3][3] > 0, X[k][3][3] == X[k + 1][3][3]))
+        fixed_c.append(If(And(X[k][2][2] > 0, X[k + 1][2][2] > 0,
+                              X[k][2][3] > 0, X[k + 1][2][3] > 0,
+                              X[k][3][2] > 0, X[k + 1][3][2] > 0,
+                              X[k][3][3] > 0, X[k + 1][3][3] > 0),
+                          And(X[k][2][2] == X[k + 1][2][2],     # then
+                              X[k][2][3] == X[k + 1][2][3],
+                              X[k][3][2] == X[k + 1][3][2],
+                              X[k][3][3] == X[k + 1][3][3]),
+                          True))    # else
 
     cell_zero_c = []
     # for k in range(BOARDS - 1):
@@ -226,13 +238,16 @@ def g15():
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c)
     r = s.check()
+    print(s.assertions())
     if r == sat:
         print(r)
         m = s.model()
+        print("model -----")
         print(m)
         ev = [[[m.evaluate(X[k][i][j]) for j in range(4)]
                for i in range(4)]
               for k in range(BOARDS)]
+        print("ev -----")
         print(ev)
     else:
         print(r)
