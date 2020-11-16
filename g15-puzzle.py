@@ -31,6 +31,7 @@ def g15():
     set_param('parallel.enable', True)
     set_param('proof', True)
     set_param(verbose=1)
+    z3.enable_trace("tracing: ")
     cells_c = [And(0 <= X[t][i][j], X[t][i][j] <= 15) for j in range(4) for i in range(4) for t in range(BOARDS)]
     distinct_c = []
     for t in range(BOARDS):
@@ -319,10 +320,11 @@ def g15():
     cell_zero_c = []
     for t in range(BOARDS - 1):
         # # quadrante SEE
+        #   t 1                   t 0                 t 0
         #   | 0  1  2  3          | 0  1  2  3        | 0  1  2  3
         # --|-----------        --|-----------      --|-----------
         # 0 | 1, 2, 3, 4        0 | 1, 2, 3, 4      0 | 1, 2, 3, 4
-        # 1 | 5, 6, 7, 8  -->   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
+        # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
         cell_zero_c.append(If(X[t][3][3] == 0,
@@ -334,6 +336,7 @@ def g15():
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
     r = s.check()
     # print(s.assertions())
+    # print(s.help())
     print(f"SOLUTION: {r}")
     if r == sat:
         print("MODEL")
