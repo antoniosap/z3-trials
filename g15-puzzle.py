@@ -37,7 +37,8 @@ def g15():
         distinct_c.append(Distinct([X[t][i][j] for i in range(4) for j in range(4)]))
     final_state_c = [X[BOARDS - 1][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
     init_state_c = [X[0][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
-    op = [Int('op_%d' % n) for n in range(BOARDS - 1)]
+    op = [Int('op_%d' % t) for t in range(BOARDS - 1)]
+    op_c = [And(1 <= op[t], op[t] <= 2) for t in range(BOARDS - 1)]
     # moves_c = [X[t - 1][i][j] == move_tile(op[t], t, i, j) for i in range(4) for j in range(4) for t in range(BOARDS - 1)]
     # moves_c = [Or(move_down(1, 2, 3), move_up(1, 2, 3), move_right(1, 2, 3))]
     # moves_c = move_down(1, 2, 3)
@@ -325,26 +326,28 @@ def g15():
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
         cell_zero_c.append(If(X[t][3][3] == 0,
-                              Xor(And(X[t][3][3] == X[t + 1][3][2], X[t][3][2] == X[t + 1][3][3]),
-                                  And(X[t][3][3] == X[t + 1][2][3], X[t][2][3] == X[t + 1][3][3])),
+                              Xor(If(op[t] == 1, And(X[t][3][3] == X[t + 1][3][2], X[t][3][2] == X[t + 1][3][3]), True),
+                                  If(op[t] == 2, And(X[t][3][3] == X[t + 1][2][3], X[t][2][3] == X[t + 1][3][3]), True)),
                               True))
 
     s = Solver()
-    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c)
+    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
     r = s.check()
     # print(s.assertions())
+    print(f"SOLUTION: {r}")
     if r == sat:
-        print(r)
+        print("MODEL")
         m = s.model()
-        print("model -----")
         print(m)
         ev = [[[m.evaluate(X[t][i][j]) for j in range(4)]
                for i in range(4)]
               for t in range(BOARDS)]
-        print("ev -----")
         print(ev)
+        print("MOVES")
+        mv = [m[op[t]] for t in range(BOARDS - 1)]
+        print(mv)
     else:
-        print(r)
+        pass
         # print(s.param_descrs())
         # print(s.sexpr())
         # print(s.help())
@@ -499,5 +502,6 @@ if __name__ == '__main__':
     print(f"Z3 version {z3.get_full_version()}")
     root = tk.Tk()
     root.geometry("+1000+100")
+    root.title("SAT/SMT 15 puzzle")
     app = App(master=root)
     app.mainloop()
