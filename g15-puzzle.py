@@ -331,6 +331,11 @@ def g15():
     def swap_move(tt, move_pos_name, pos_1, pos_2):
         return If(op[tt] == move[move_pos_name], swap_x(t, pos_1, pos_2), True)
 
+    cell_neighbors = {
+        15: {MOVE_LEFT: 14, MOVE_UP: 11, MOVE_RIGHT: 16},
+        16: {MOVE_LEFT: 15, MOVE_UP: 12}
+    }
+
     cell_zero_c = []
     for t in range(BOARDS - 1):
         # # quadrante SEE
@@ -341,9 +346,11 @@ def g15():
         # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-        cell_zero_c.append(If(cell_x(t + 1, 16) == 0,
-                              AtMost(swap_move(t, 'LEFT', 16, 15),
-                                     swap_move(t, 'UP', 16, 12),
+        cell_center = 16
+        swap_neighbors = {MOVE_LEFT: 15, MOVE_UP: 12}
+        cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
+                              AtMost(swap_move(t, MOVE_LEFT, cell_center, swap_neighbors[MOVE_LEFT]),
+                                     swap_move(t, MOVE_UP, cell_center, swap_neighbors[MOVE_UP]),
                                      1),
                               True))
 
