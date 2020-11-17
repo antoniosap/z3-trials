@@ -7,7 +7,6 @@ import tkinter as tk
 from z3 import *
 
 BOARDS = 2
-MOVE_DOWN, MOVE_UP, MOVE_LEFT, MOVE_RIGHT = 0, 1, 2, 3
 
 X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, t + 1))
        for j in range(4)]
@@ -317,6 +316,9 @@ def g15():
                           True))  # else
 
     # le tessere blank => swap con solo una adiacente
+    MOVE_NULL, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN = 'NULL', 'LEFT', 'RIGHT', 'UP', 'DOWN'
+    move_name = [MOVE_NULL, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN]
+    move = {k: v for k, v in zip(move_name, range(len(move_name)))}
     cell_pos = [(-1, -1)] + [(i, j) for i in range(4) for j in range(4)]
 
     def cell_x(tt, pos):
@@ -325,6 +327,9 @@ def g15():
 
     def swap_x(tt, pos_1, pos_2):
         return And(cell_x(tt + 1, pos_1) == cell_x(tt, pos_2), cell_x(tt + 1, pos_2) == cell_x(tt, pos_1))
+
+    def swap_move(tt, move_pos_name, pos_1, pos_2):
+        return If(op[tt] == move[move_pos_name], swap_x(t, pos_1, pos_2), True)
 
     cell_zero_c = []
     for t in range(BOARDS - 1):
@@ -337,8 +342,8 @@ def g15():
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
         cell_zero_c.append(If(cell_x(t + 1, 16) == 0,
-                              AtMost(If(op[t] == 1, swap_x(t, 16, 15), True),
-                                     If(op[t] == 2, swap_x(t, 16, 12), True),
+                              AtMost(swap_move(t, 'LEFT', 16, 15),
+                                     swap_move(t, 'UP', 16, 12),
                                      1),
                               True))
 
@@ -349,15 +354,15 @@ def g15():
     # print(s.help())
     print(f"SOLUTION: {r}")
     if r == sat:
-        print("MODEL")
+        print("MODEL:")
         m = s.model()
         print(m)
-        ev = [[[m.evaluate(X[t][i][j]) for j in range(4)]
-               for i in range(4)]
-              for t in range(BOARDS)]
-        print(ev)
-        print("MOVES")
-        mv = [m[op[t]] for t in range(BOARDS - 1)]
+        # ev = [[[m.evaluate(X[t][i][j]) for j in range(4)]
+        #       for i in range(4)]
+        #      for t in range(BOARDS)]
+        # print(ev)
+        print("MOVES:")
+        mv = [move_name[int(str(m[op[t]]))] for t in range(BOARDS - 1)]
         print(mv)
     else:
         pass
@@ -411,15 +416,6 @@ def move_right(board, row, col):
         return [If(X[board - 1][row][col + 1] == 0, move(board, row, col), [])]
     else:
         return []
-
-
-def move_tile(op, board, row, col):
-    return If(op == MOVE_DOWN, move_down(board, row, col),
-              If(op == MOVE_UP, move_up(board, row, col),
-                 If(op == MOVE_LEFT, move_left(board, row, col),
-                    If(op == MOVE_RIGHT, move_right(board, row, col),
-                       move_null()))))
-
 
 # ----------------------------------------------------------------------------------------------------
 
