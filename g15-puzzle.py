@@ -31,7 +31,7 @@ def g15():
     set_param('parallel.enable', True)
     set_param('proof', True)
     set_param(verbose=1)
-    z3.enable_trace("tracing: ")
+    z3.enable_trace('sat')
     cells_c = [And(0 <= X[t][i][j], X[t][i][j] <= 15) for j in range(4) for i in range(4) for t in range(BOARDS)]
     distinct_c = []
     for t in range(BOARDS):
@@ -316,20 +316,21 @@ def g15():
                               X[t][3][3] == X[t + 1][3][3]),
                           True))  # else
 
-    # le tessere zero => swap con solo una adiacente
+    # le tessere blank => swap con solo una adiacente
     cell_zero_c = []
     for t in range(BOARDS - 1):
         # # quadrante SEE
-        #   t 1                   t 0                 t 0
+        #   t 1                   t 0  op 1           t 0  op 2
         #   | 0  1  2  3          | 0  1  2  3        | 0  1  2  3
         # --|-----------        --|-----------      --|-----------
         # 0 | 1, 2, 3, 4        0 | 1, 2, 3, 4      0 | 1, 2, 3, 4
         # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-        cell_zero_c.append(If(X[t][3][3] == 0,
-                              Xor(If(op[t] == 1, And(X[t][3][3] == X[t + 1][3][2], X[t][3][2] == X[t + 1][3][3]), True),
-                                  If(op[t] == 2, And(X[t][3][3] == X[t + 1][2][3], X[t][2][3] == X[t + 1][3][3]), True)),
+        cell_zero_c.append(If(X[t + 1][3][3] == 0,
+                              AtMost(If(op[t] == 1, And(X[t + 1][3][3] == X[t][3][2], X[t + 1][3][2] == X[t][3][3]), True),
+                                     If(op[t] == 2, And(X[t + 1][3][3] == X[t][2][3], X[t + 1][2][3] == X[t][3][3]), True),
+                                     1),
                               True))
 
     s = Solver()
