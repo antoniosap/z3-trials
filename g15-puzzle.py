@@ -317,6 +317,15 @@ def g15():
                           True))  # else
 
     # le tessere blank => swap con solo una adiacente
+    cell_pos = [(-1, -1)] + [(i, j) for i in range(4) for j in range(4)]
+
+    def cell_x(tt, pos):
+        i, j = cell_pos[pos]
+        return X[tt][i][j]
+
+    def swap_x(tt, pos_1, pos_2):
+        return And(cell_x(tt + 1, pos_1) == cell_x(tt, pos_2), cell_x(tt + 1, pos_2) == cell_x(tt, pos_1))
+
     cell_zero_c = []
     for t in range(BOARDS - 1):
         # # quadrante SEE
@@ -327,9 +336,9 @@ def g15():
         # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-        cell_zero_c.append(If(X[t + 1][3][3] == 0,
-                              AtMost(If(op[t] == 1, And(X[t + 1][3][3] == X[t][3][2], X[t + 1][3][2] == X[t][3][3]), True),
-                                     If(op[t] == 2, And(X[t + 1][3][3] == X[t][2][3], X[t + 1][2][3] == X[t][3][3]), True),
+        cell_zero_c.append(If(cell_x(t + 1, 16) == 0,
+                              AtMost(If(op[t] == 1, swap_x(t, 16, 15), True),
+                                     If(op[t] == 2, swap_x(t, 16, 12), True),
                                      1),
                               True))
 
