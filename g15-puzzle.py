@@ -331,7 +331,22 @@ def g15():
     def swap_move(tt, move_pos_name, pos_1, pos_2):
         return If(op[tt] == move[move_pos_name], swap_x(t, pos_1, pos_2), True)
 
+    # TODO factorize + generalize su AST, abstract syntax tree, python ast
     cell_neighbors = {
+        1: {},
+        2: {},
+        3: {},
+        4: {},
+        5: {},
+        6: {},
+        7: {},
+        8: {},
+        9: {},
+        10: {},
+        11: {},
+        12: {},
+        13: {},
+        14: {MOVE_LEFT: 13, MOVE_UP: 10, MOVE_RIGHT: 15},
         15: {MOVE_LEFT: 14, MOVE_UP: 11, MOVE_RIGHT: 16},
         16: {MOVE_LEFT: 15, MOVE_UP: 12}
     }
@@ -347,10 +362,9 @@ def g15():
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
         cell_center = 16
-        swap_neighbors = {MOVE_LEFT: 15, MOVE_UP: 12}
         cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
-                              AtMost(swap_move(t, MOVE_LEFT, cell_center, swap_neighbors[MOVE_LEFT]),
-                                     swap_move(t, MOVE_UP, cell_center, swap_neighbors[MOVE_UP]),
+                              AtMost(swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
+                                     swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
                                      1),
                               True))
 
