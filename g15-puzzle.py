@@ -333,10 +333,10 @@ def g15():
 
     # TODO factorize + generalize su AST, abstract syntax tree, python ast
     cell_neighbors = {
-        1: {},
-        2: {},
-        3: {},
-        4: {},
+        1: {MOVE_DOWN: 5, MOVE_RIGHT: 2},
+        2: {MOVE_LEFT: 1, MOVE_DOWN: 6, MOVE_RIGHT: 3},
+        3: {MOVE_LEFT: 2, MOVE_DOWN: 7, MOVE_RIGHT: 4},
+        4: {MOVE_DOWN: 8, MOVE_LEFT: 3},
         5: {},
         6: {},
         7: {},
@@ -345,7 +345,7 @@ def g15():
         10: {},
         11: {},
         12: {},
-        13: {},
+        13: {MOVE_UP: 9, MOVE_RIGHT: 14},
         14: {MOVE_LEFT: 13, MOVE_UP: 10, MOVE_RIGHT: 15},
         15: {MOVE_LEFT: 14, MOVE_UP: 11, MOVE_RIGHT: 16},
         16: {MOVE_LEFT: 15, MOVE_UP: 12}
