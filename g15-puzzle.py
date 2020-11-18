@@ -6,7 +6,7 @@
 import tkinter as tk
 from z3 import *
 
-BOARDS = 2
+BOARDS = 3
 
 X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, t + 1))
        for j in range(4)]
@@ -337,14 +337,14 @@ def g15():
         2: {MOVE_LEFT: 1, MOVE_DOWN: 6, MOVE_RIGHT: 3},
         3: {MOVE_LEFT: 2, MOVE_DOWN: 7, MOVE_RIGHT: 4},
         4: {MOVE_DOWN: 8, MOVE_LEFT: 3},
-        5: {},
-        6: {},
-        7: {},
-        8: {},
-        9: {},
-        10: {},
-        11: {},
-        12: {},
+        5: {MOVE_UP: 1, MOVE_DOWN: 9, MOVE_RIGHT: 6},
+        6: {MOVE_LEFT: 5, MOVE_UP: 2, MOVE_DOWN: 10, MOVE_RIGHT: 7},
+        7: {MOVE_LEFT: 6, MOVE_UP: 3, MOVE_DOWN: 11, MOVE_RIGHT: 8},
+        8: {MOVE_LEFT: 7, MOVE_UP: 4, MOVE_DOWN: 12},
+        9: {MOVE_RIGHT: 10, MOVE_UP: 5, MOVE_DOWN: 13},
+        10: {MOVE_LEFT: 9, MOVE_UP: 6, MOVE_DOWN: 14, MOVE_RIGHT: 11},
+        11: {MOVE_LEFT: 10, MOVE_UP: 7, MOVE_DOWN: 15, MOVE_RIGHT: 12},
+        12: {MOVE_LEFT: 11, MOVE_UP: 8, MOVE_DOWN: 16},
         13: {MOVE_UP: 9, MOVE_RIGHT: 14},
         14: {MOVE_LEFT: 13, MOVE_UP: 10, MOVE_RIGHT: 15},
         15: {MOVE_LEFT: 14, MOVE_UP: 11, MOVE_RIGHT: 16},
@@ -378,9 +378,14 @@ def g15():
         print("MODEL:")
         m = s.model()
         print(m)
+        print("BOARDS:")
+        for t in range(BOARDS):
+            print(f"BOARD t {t}")
+            board = [[int(str(m.evaluate(X[t][i][j]))) for j in range(4)] for i in range(4)]
+            g15_display(board)
         # ev = [[[m.evaluate(X[t][i][j]) for j in range(4)]
-        #       for i in range(4)]
-        #      for t in range(BOARDS)]
+        #      for i in range(4)]
+        #     for t in range(BOARDS)]
         # print(ev)
         print("MOVES:")
         mv = [move_name[int(str(m[op[t]]))] for t in range(BOARDS - 1)]
