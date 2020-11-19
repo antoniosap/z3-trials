@@ -325,11 +325,17 @@ def g15():
         i, j = cell_pos[pos]
         return X[tt][i][j]
 
+    def cell_fixed(tt, pos):
+        return cell_x(tt + 1, pos) == cell_x(tt, pos)
+
     def swap_x(tt, pos_1, pos_2):
         return And(cell_x(tt + 1, pos_1) == cell_x(tt, pos_2), cell_x(tt + 1, pos_2) == cell_x(tt, pos_1))
 
     def swap_move(tt, move_pos_name, pos_1, pos_2):
         return If(op[tt] == move[move_pos_name], swap_x(t, pos_1, pos_2), True)
+
+    def null_move(tt):
+        return If(op[tt] == move[MOVE_NULL], True, True)
 
     # TODO factorize + generalize su AST, abstract syntax tree, python ast
     cell_neighbors = {
@@ -361,12 +367,24 @@ def g15():
         # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
         # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
         # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-        cell_center = 16
-        cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
-                              AtMost(swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
-                                     swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
+        # cell_center = 16
+        # cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
+        #                       AtMost(swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
+        #                              swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
+        #                              # null_move(t),
+        #                              1),
+        #                       True))
+        cell_zero_c.append(If(cell_x(t + 1, 16) == 0,
+                              AtMost(And(swap_move(t, MOVE_LEFT, 16, 15)),
+                                     And(swap_move(t, MOVE_UP, 16, 12)),
+                                     # null_move(t),
                                      1),
                               True))
+        cell_zero_c.append(cell_fixed(t, 14))
+        cell_zero_c.append(cell_fixed(t, 13))
+        cell_zero_c.append(cell_fixed(t, 11))
+        cell_zero_c.append(cell_fixed(t, 10))
+        cell_zero_c.append(cell_fixed(t, 9))
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
@@ -375,18 +393,14 @@ def g15():
     # print(s.help())
     print(f"SOLUTION: {r}")
     if r == sat:
-        print("MODEL:")
+        # print("MODEL:")
         m = s.model()
-        print(m)
+        # print(m)
         print("BOARDS:")
         for t in range(BOARDS):
             print(f"BOARD t {t}")
             board = [[int(str(m.evaluate(X[t][i][j]))) for j in range(4)] for i in range(4)]
             g15_display(board)
-        # ev = [[[m.evaluate(X[t][i][j]) for j in range(4)]
-        #      for i in range(4)]
-        #     for t in range(BOARDS)]
-        # print(ev)
         print("MOVES:")
         mv = [move_name[int(str(m[op[t]]))] for t in range(BOARDS - 1)]
         print(mv)
