@@ -6,7 +6,7 @@
 import tkinter as tk
 from z3 import *
 
-BOARDS = 3
+BOARDS = 2
 
 X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, t + 1))
        for j in range(4)]
@@ -15,13 +15,13 @@ X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, t + 1))
 
 init_state = ((1, 2, 3, 4),
               (5, 6, 7, 8),
-              (9, 10, 11, 0),
-              (13, 14, 15, 12))
+              (9, 10, 11, 12),
+              (13, 14, 0, 15))
 
 final_state = ((1, 2, 3, 4),
                (5, 6, 7, 8),
                (9, 10, 11, 12),
-               (13, 14, 15, 0))
+               (13, 0, 14, 15))
 
 current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
 
@@ -325,6 +325,9 @@ def g15():
         i, j = cell_pos[pos]
         return X[tt][i][j]
 
+    def cell_blank(tt, pos):
+        return cell_x(tt, pos) == 0
+
     def cell_fixed(tt, pos_list):
         return And([cell_x(tt + 1, pos) == cell_x(tt, pos) for pos in pos_list])
 
@@ -332,7 +335,7 @@ def g15():
         return And(cell_x(tt + 1, pos_t1) == cell_x(tt, pos_t0), cell_x(tt + 1, pos_t0) == cell_x(tt, pos_t1))
 
     def cell_swap_move(tt, move_pos_name, pos_t1, pos_t0):
-        print(f"cell_swap_move t {tt} {op[tt]}=={move_pos_name} {pos_t1} {pos_t0}")
+        print(f"cell_swap_move: t={tt} if {op[tt]}=={move_pos_name} swap {pos_t1} {pos_t0}")
         return Implies(op[tt] == move[move_pos_name], cell_swap_x(tt, pos_t1, pos_t0))
 
     def null_move(tt):
@@ -359,29 +362,34 @@ def g15():
     }
 
     cell_zero_c = []
-    for t in range(BOARDS - 1):
-        # # quadrante SEE
-        #   t 1                   t 0  op 1           t 0  op 2
-        #   | 0  1  2  3          | 0  1  2  3        | 0  1  2  3
-        # --|-----------        --|-----------      --|-----------
-        # 0 | 1, 2, 3, 4        0 | 1, 2, 3, 4      0 | 1, 2, 3, 4
-        # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
-        # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
-        # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-        # cell_center = 16
-        # cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
-        #                       AtMost(cell_swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
-        #                              cell_swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
-        #                              # null_move(t),
-        #                              1),
-        #                       True))
-        cell_zero_c.append(Implies(cell_x(t + 1, 16) == 0,
-                                   AtMost(cell_swap_move(t, MOVE_LEFT, 16, 15),
-                                          cell_swap_move(t, MOVE_UP, 16, 12),
-                                          # null_move(t),
-                                          1),
-                                   ))
-        cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    # for t in range(BOARDS - 1):
+    #     # # quadrante SEE
+    #     #   t 1                   t 0  op 1           t 0  op 2
+    #     #   | 0  1  2  3          | 0  1  2  3        | 0  1  2  3
+    #     # --|-----------        --|-----------      --|-----------
+    #     # 0 | 1, 2, 3, 4        0 | 1, 2, 3, 4      0 | 1, 2, 3, 4
+    #     # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
+    #     # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
+    #     # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
+    #     # cell_center = 16
+    #     # cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
+    #     #                       AtMost(cell_swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
+    #     #                              cell_swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
+    #     #                              # null_move(t),
+    #     #                              1),
+    #     #                       True))
+    #     # cell_zero_c.append(Implies(cell_blank(t + 1, 16),
+    #     #                            AtMost(cell_swap_move(t, MOVE_LEFT, 16, 15),
+    #     #                                   cell_swap_move(t, MOVE_UP, 16, 12),
+    #     #                                   # null_move(t),
+    #     #                                   1),
+    #     #                            ))
+    #     # cell_zero_c.append(Implies(cell_blank(t + 1, 16),
+    #     #                           cell_swap_move(t, MOVE_RIGHT, 16, 15),
+    #     #                           ))
+    #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    t = 0
+    cell_zero_c.append(cell_fixed(t, (15, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
