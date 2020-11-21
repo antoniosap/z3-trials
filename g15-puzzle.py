@@ -29,16 +29,15 @@ current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
 def g15():
     set_param('parallel.enable', True)
     set_param('proof', True)
-    set_param(verbose=1)
-    z3.enable_trace('sat')
+    set_param(verbose=10)
+    z3_trace()
+
     cells_c = [And(0 <= X[t][i][j], X[t][i][j] <= 15) for j in range(4) for i in range(4) for t in range(BOARDS)]
     distinct_c = []
     for t in range(BOARDS):
         distinct_c.append(Distinct([X[t][i][j] for i in range(4) for j in range(4)]))
     final_state_c = [X[BOARDS - 1][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
     init_state_c = [X[0][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
-    op = [Int('op_%d' % t) for t in range(BOARDS - 1)]
-    op_c = [And(1 <= op[t], op[t] <= 2) for t in range(BOARDS - 1)]
     # moves_c = [X[t - 1][i][j] == move_tile(op[t], t, i, j) for i in range(4) for j in range(4) for t in range(BOARDS - 1)]
     # moves_c = [Or(move_down(1, 2, 3), move_up(1, 2, 3), move_right(1, 2, 3))]
     # moves_c = move_down(1, 2, 3)
@@ -320,6 +319,8 @@ def g15():
     move_name = [MOVE_NULL, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN]
     move = {k: v for k, v in zip(move_name, range(len(move_name)))}
     cell_pos = [(-1, -1)] + [(i, j) for i in range(4) for j in range(4)]
+    op = [Int('op_%d' % t) for t in range(BOARDS - 1)]
+    op_c = [And(0 <= op[t], op[t] <= len(move_name) - 1) for t in range(BOARDS - 1)]
 
     def cell_x(tt, pos):
         i, j = cell_pos[pos]
@@ -389,13 +390,27 @@ def g15():
     #     #                           ))
     #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     t = 0
-    cell_zero_c.append(cell_fixed(t, (15, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
+                           cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
+    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
+    #                            cell_swap_move(t, MOVE_NULL, pos_t0=14, pos_t1=15)))
+    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
+    #                            cell_swap_move(t, MOVE_LEFT, pos_t0=14, pos_t1=15)))
+    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
+    #                            cell_swap_move(t, MOVE_UP, pos_t0=14, pos_t1=15)))
+    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
+    #                            cell_swap_move(t, MOVE_DOWN, pos_t0=14, pos_t1=15)))
+    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
+    #                            cell_swap_move(t, MOVE_RIGHT, pos_t0=14, pos_t1=15)))
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
     r = s.check()
     # print(s.assertions())
     # print(s.help())
+    # print(s.to_smt2())
+    # print(s.units())
     print(f"SOLUTION: {r}")
     if r == sat:
         # print("MODEL:")
@@ -468,12 +483,16 @@ def move_right(board, row, col):
 def g15_display(s):
     print("|----|----|----|----|")
     print("| {:2d} | {:2d} | {:2d} | {:2d} |".format(s[0][0], s[0][1], s[0][2], s[0][3]).replace(' 0 ', '   '))
+    print("| P1 | P2 | P3 | P4 |")
     print("|----|----|----|----|")
     print("| {:2d} | {:2d} | {:2d} | {:2d} |".format(s[1][0], s[1][1], s[1][2], s[1][3]).replace(' 0 ', '   '))
+    print("| P5 | P6 | P7 | P8 |")
     print("|----|----|----|----|")
     print("| {:2d} | {:2d} | {:2d} | {:2d} |".format(s[2][0], s[2][1], s[2][2], s[2][3]).replace(' 0 ', '   '))
+    print("| P9 |P10 |P11 |P12 |")
     print("|----|----|----|----|")
     print("| {:2d} | {:2d} | {:2d} | {:2d} |".format(s[3][0], s[3][1], s[3][2], s[3][3]).replace(' 0 ', '   '))
+    print("|P13 |P14 |P15 |P16 |")
     print("|----|----|----|----|")
     print()
 
@@ -515,6 +534,42 @@ def g15_move_right(s):
         s[r][c] = s[r][c - 1]
         s[r][c - 1] = 0
     return s
+
+
+def z3_trace():
+    z3.enable_trace('sat')
+    z3.enable_trace('goal')
+    z3.enable_trace('ackermannize')
+    z3.enable_trace('model_constructor')
+    z3.enable_trace('z3_replayer')
+    z3.enable_trace('algebraic2expr')
+    z3.enable_trace('pp_ast_dot_step')
+    z3.enable_trace('smt2_pp')
+    z3.enable_trace('pp_let')
+    z3.enable_trace('pp_scope')
+    z3.enable_trace('ast_translation')
+    z3.enable_trace('ast')
+    z3.enable_trace('mk_modus_ponens')
+    z3.enable_trace('mk_transitivity')
+    z3.enable_trace('distinct')
+    z3.enable_trace('unit_resolution')
+    z3.enable_trace('datatype')
+    z3.enable_trace('euf')
+    z3.enable_trace('nnf')
+    z3.enable_trace('pattern_inference')
+    z3.enable_trace('proof_checker')
+    z3.enable_trace('rewriter')
+    z3.enable_trace('seq')
+    z3.enable_trace('seq_verbose')
+    z3.enable_trace('unifier')
+    z3.enable_trace('grobner')
+    z3.enable_trace('dd.solver')
+    z3.enable_trace('grobner_d')
+    z3.enable_trace('nla_solver')
+    z3.enable_trace('model')
+    z3.enable_trace('opt')
+    z3.enable_trace('sat_tactic')
+    z3.enable_trace('model_checker')
 
 
 class App(tk.Frame):
