@@ -17,7 +17,7 @@ X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
 init_state = ((1, 2, 3, 4),
               (5, 6, 7, 8),
               (9, 10, 11, 12),
-              (13, 14, 0, 15))
+              (0, 13, 14, 15))
 
 final_state = ((1, 2, 3, 4),
                (5, 6, 7, 8),
@@ -31,7 +31,7 @@ def g15():
     set_param('parallel.enable', True)
     set_param('proof', True)
     set_param(verbose=10)
-    z3_trace()
+    # z3_trace()
 
     cells_c = [And(0 <= X[t][i][j], X[t][i][j] <= 15) for j in range(4) for i in range(4) for t in range(BOARDS)]
     distinct_c = []
@@ -388,7 +388,7 @@ def g15():
     #     #                           ))
     #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     t = 0
-    cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    #cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     # cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
     #                        cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
     # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
@@ -401,7 +401,23 @@ def g15():
     #                            cell_swap_move(t, MOVE_DOWN, pos_t0=14, pos_t1=15)))
     # cell_zero_c.append(Implies(cell_blank(t + 1, pos=14),
     #                           cell_swap_move(t, MOVE_RIGHT, pos_t0=14, pos_t1=15)))
-    cell_zero_c.append(cell_blank(t + 1, pos=14))
+    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), op[t] == move[MOVE_RIGHT]),
+    #                           cell_swap_x(t, pos_t0=15, pos_t1=14)))
+    # cell_zero_c.append(op[t] > move[MOVE_NULL])
+    # cell_zero_c.append(cell_blank(t+1, pos=14))
+    # cell_zero_c.append(Implies(cell_x(t, pos=14) == cell_x(t + 1, pos=15), op[t] == move[MOVE_RIGHT]))
+    # cell_zero_c.append(Implies(cell_x(t, pos=10) == cell_x(t + 1, pos=14), op[t] == move[MOVE_DOWN]))
+    # --> intorno di P16
+    cell_zero_c.append(Implies(And(cell_blank(t, pos=12), cell_x(t, pos=12) == cell_x(t + 1, pos=16)),
+                               And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_UP])))
+    cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)),
+                               And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_RIGHT])))
+    #
+    # --> intorno di P13
+    cell_zero_c.append(Implies(And(cell_blank(t, pos=13), cell_x(t, pos=13) == cell_x(t + 1, pos=14)),
+                               And(cell_blank(t + 1, pos=14), op[t] == move[MOVE_LEFT])))
+    #
+    cell_zero_c.append(op[t] != move[MOVE_NULL])
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
@@ -414,7 +430,7 @@ def g15():
     if r == sat:
         # print("MODEL:")
         m = s.model()
-        print(m)
+        # print(m)
         print("BOARDS:")
         for t in range(BOARDS):
             print(f"BOARD t {t}")
