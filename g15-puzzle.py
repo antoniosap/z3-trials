@@ -8,9 +8,10 @@ from z3 import *
 
 BOARDS = 2
 
-X = [[[Int("x_r%s_c%s_t%s" % (i + 1, j + 1, t + 1))
-       for j in range(4)]
-      for i in range(4)]
+X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
+      [Int(f"P5_t{t}"), Int(f"P6_t{t}"), Int(f"P7_t{t}"), Int(f"P8_t{t}")],
+      [Int(f"P9_t{t}"), Int(f"P10_t{t}"), Int(f"P11_t{t}"), Int(f"P12_t{t}")],
+      [Int(f"P13_t{t}"), Int(f"P14_t{t}"), Int(f"P15_t{t}"), Int(f"P16_t{t}")]]
      for t in range(BOARDS)]
 
 init_state = ((1, 2, 3, 4),
@@ -38,10 +39,7 @@ def g15():
         distinct_c.append(Distinct([X[t][i][j] for i in range(4) for j in range(4)]))
     final_state_c = [X[BOARDS - 1][i][j] == final_state[i][j] for i in range(4) for j in range(4)]
     init_state_c = [X[0][i][j] == init_state[i][j] for i in range(4) for j in range(4)]
-    # moves_c = [X[t - 1][i][j] == move_tile(op[t], t, i, j) for i in range(4) for j in range(4) for t in range(BOARDS - 1)]
-    # moves_c = [Or(move_down(1, 2, 3), move_up(1, 2, 3), move_right(1, 2, 3))]
-    # moves_c = move_down(1, 2, 3)
-    moves_c = []
+
     # le tessere senza il buco e senza buchi nell intorno, non si muovono
     fixed_c = []
     for t in range(BOARDS - 1):
@@ -391,8 +389,8 @@ def g15():
     #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     t = 0
     cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
-    cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
-                           cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
+    # cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
+    #                        cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
     # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
     #                            cell_swap_move(t, MOVE_NULL, pos_t0=14, pos_t1=15)))
     # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
@@ -401,8 +399,9 @@ def g15():
     #                            cell_swap_move(t, MOVE_UP, pos_t0=14, pos_t1=15)))
     # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
     #                            cell_swap_move(t, MOVE_DOWN, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
-    #                            cell_swap_move(t, MOVE_RIGHT, pos_t0=14, pos_t1=15)))
+    # cell_zero_c.append(Implies(cell_blank(t + 1, pos=14),
+    #                           cell_swap_move(t, MOVE_RIGHT, pos_t0=14, pos_t1=15)))
+    cell_zero_c.append(cell_blank(t + 1, pos=14))
 
     s = Solver()
     s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
@@ -415,7 +414,7 @@ def g15():
     if r == sat:
         # print("MODEL:")
         m = s.model()
-        # print(m)
+        print(m)
         print("BOARDS:")
         for t in range(BOARDS):
             print(f"BOARD t {t}")
