@@ -14,15 +14,15 @@ X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P13_t{t}"), Int(f"P14_t{t}"), Int(f"P15_t{t}"), Int(f"P16_t{t}")]]
      for t in range(BOARDS)]
 
-init_state = ((1, 2, 3, 4),
-              (5, 6, 7, 8),
+init_state = ((1, 0, 3, 4),
+              (5, 2, 7, 8),
               (9, 10, 11, 12),
-              (0, 13, 14, 15))
+              (13, 14, 15, 6))
 
 final_state = ((1, 2, 3, 4),
-               (5, 6, 7, 8),
+               (5, 0, 7, 8),
                (9, 10, 11, 12),
-               (13, 0, 14, 15))
+               (13, 14, 15, 6))
 
 current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
 
@@ -341,23 +341,24 @@ def g15():
         return If(op[tt] == move[MOVE_NULL], True, True)
 
     # TODO factorize + generalize su AST, abstract syntax tree, python ast
-    cell_neighbors = {
-        1: {MOVE_DOWN: 5, MOVE_RIGHT: 2},
-        2: {MOVE_LEFT: 1, MOVE_DOWN: 6, MOVE_RIGHT: 3},
-        3: {MOVE_LEFT: 2, MOVE_DOWN: 7, MOVE_RIGHT: 4},
-        4: {MOVE_DOWN: 8, MOVE_LEFT: 3},
-        5: {MOVE_UP: 1, MOVE_DOWN: 9, MOVE_RIGHT: 6},
-        6: {MOVE_LEFT: 5, MOVE_UP: 2, MOVE_DOWN: 10, MOVE_RIGHT: 7},
-        7: {MOVE_LEFT: 6, MOVE_UP: 3, MOVE_DOWN: 11, MOVE_RIGHT: 8},
-        8: {MOVE_LEFT: 7, MOVE_UP: 4, MOVE_DOWN: 12},
-        9: {MOVE_RIGHT: 10, MOVE_UP: 5, MOVE_DOWN: 13},
-        10: {MOVE_LEFT: 9, MOVE_UP: 6, MOVE_DOWN: 14, MOVE_RIGHT: 11},
-        11: {MOVE_LEFT: 10, MOVE_UP: 7, MOVE_DOWN: 15, MOVE_RIGHT: 12},
-        12: {MOVE_LEFT: 11, MOVE_UP: 8, MOVE_DOWN: 16},
-        13: {MOVE_UP: 9, MOVE_RIGHT: 14},
-        14: {MOVE_LEFT: 13, MOVE_UP: 10, MOVE_RIGHT: 15},
-        15: {MOVE_LEFT: 14, MOVE_UP: 11, MOVE_RIGHT: 16},
-        16: {MOVE_LEFT: 15, MOVE_UP: 12}
+    cell_move = {
+        # key = cell center
+        1: {5: MOVE_UP, 2: MOVE_LEFT},  # ok
+        2: {6: MOVE_UP, 1: MOVE_RIGHT, 3: MOVE_LEFT},  # ok
+        3: {7: MOVE_UP, 2: MOVE_RIGHT, 4: MOVE_LEFT},  # ok
+        4: {8: MOVE_UP, 3: MOVE_LEFT},  # ok
+        5: {9: MOVE_UP, 1: MOVE_DOWN, 6: MOVE_LEFT},  # ok
+        6: {10: MOVE_UP, 7: MOVE_LEFT, 2: MOVE_DOWN, 5: MOVE_RIGHT},  # ok
+        7: {11: MOVE_UP, 3: MOVE_DOWN, 8: MOVE_LEFT, 6: MOVE_RIGHT},  # ok
+        8: {12: MOVE_UP, 4: MOVE_DOWN, 7: MOVE_RIGHT},  # ok
+        9: {10: MOVE_LEFT, 13: MOVE_UP, 5: MOVE_DOWN},  # ok
+        10: {14: MOVE_UP, 11: MOVE_LEFT, 6: MOVE_DOWN, 9: MOVE_RIGHT},  # ok
+        11: {15: MOVE_UP, 12: MOVE_LEFT, 7: MOVE_DOWN, 10: MOVE_RIGHT},  # ok
+        12: {16: MOVE_UP, 8: MOVE_DOWN, 11: MOVE_RIGHT},  # ok
+        13: {9: MOVE_DOWN, 14: MOVE_LEFT},  # ok
+        14: {10: MOVE_DOWN, 13: MOVE_RIGHT, 15: MOVE_LEFT},  # ok
+        15: {11: MOVE_DOWN, 14: MOVE_RIGHT, 16: MOVE_LEFT},  # ok
+        16: {15: MOVE_RIGHT, 12: MOVE_DOWN}  # ok
     }
 
     cell_zero_c = []
@@ -408,14 +409,22 @@ def g15():
     # cell_zero_c.append(Implies(cell_x(t, pos=14) == cell_x(t + 1, pos=15), op[t] == move[MOVE_RIGHT]))
     # cell_zero_c.append(Implies(cell_x(t, pos=10) == cell_x(t + 1, pos=14), op[t] == move[MOVE_DOWN]))
     # --> intorno di P16
-    cell_zero_c.append(Implies(And(cell_blank(t, pos=12), cell_x(t, pos=12) == cell_x(t + 1, pos=16)),
-                               And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_UP])))
-    cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)),
-                               And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_RIGHT])))
+    # cell_zero_c.append(Implies(And(cell_blank(t, pos=12), cell_x(t, pos=12) == cell_x(t + 1, pos=16)),
+    #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_UP])))
+    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)),
+    #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_LEFT])))
+    #
+    # --> intorno di P
+    for cell_center in (1, 13, 14, 16):
+        for cell in cell_move[cell_center]:
+            cell_move_from = cell_move[cell_center][cell]
+            cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell)),
+                                       And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
-    cell_zero_c.append(Implies(And(cell_blank(t, pos=13), cell_x(t, pos=13) == cell_x(t + 1, pos=14)),
-                               And(cell_blank(t + 1, pos=14), op[t] == move[MOVE_LEFT])))
+    # cell_center = 13
+    # cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=14)),
+    #                            And(cell_blank(t + 1, pos=14), op[t] == move[MOVE_LEFT])))
     #
     cell_zero_c.append(op[t] != move[MOVE_NULL])
 
