@@ -343,6 +343,7 @@ def g15():
     # TODO factorize + generalize su AST, abstract syntax tree, python ast
     cell_move = {
         # key = cell center
+        0: {},
         1: {5: MOVE_UP, 2: MOVE_LEFT},  # ok
         2: {6: MOVE_UP, 1: MOVE_RIGHT, 3: MOVE_LEFT},  # ok
         3: {7: MOVE_UP, 2: MOVE_RIGHT, 4: MOVE_LEFT},  # ok
@@ -361,7 +362,7 @@ def g15():
         16: {15: MOVE_RIGHT, 12: MOVE_DOWN}  # ok
     }
 
-    cell_zero_c = []
+    #cell_zero_c = []
     # for t in range(BOARDS - 1):
     #     # # quadrante SEE
     #     #   t 1                   t 0  op 1           t 0  op 2
@@ -388,7 +389,7 @@ def g15():
     #     #                           cell_swap_move(t, MOVE_RIGHT, 16, 15),
     #     #                           ))
     #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
-    t = 0
+    # t = 0
     #cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     # cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
     #                        cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
@@ -415,11 +416,13 @@ def g15():
     #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_LEFT])))
     #
     # --> intorno di P
-    for cell_center in (1, 13, 14, 16):
-        for cell in cell_move[cell_center]:
-            cell_move_from = cell_move[cell_center][cell]
-            cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell)),
-                                       And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
+    cell_zero_c = []
+    for t in (0,):
+        for cell_center in range(16):
+            for cell in cell_move[cell_center]:
+                cell_move_from = cell_move[cell_center][cell]
+                cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell)),
+                                           And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
     # cell_center = 13
