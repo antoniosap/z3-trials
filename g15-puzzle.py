@@ -362,25 +362,28 @@ def g15():
         16: {15: MOVE_RIGHT, 12: MOVE_DOWN}  # ok
     }
 
+    def cell_out(cell_list_in):
+        return [c for c in [*range(1, 4*4+1)] if c not in cell_list_in]
+
     cell_fixed = {
         # key = cell center
         0: (),
-        1: (),
-        2: (),
-        3: (),
-        4: (),
-        5: (),
-        6: (),
-        7: (),
-        8: (),
-        9: (),
-        10: (),
-        11: (),
-        12: (),
-        13: (),
-        14: (16, 12, 11, 9, 8, 7, 6, 5, 4, 3, 2, 1),
-        15: (),
-        16: ()
+        1: cell_out((1, 2, 5)),
+        2: cell_out((1, 2, 3, 6)),
+        3: cell_out((2, 3, 4, 7)),
+        4: cell_out((3, 4, 8)),
+        5: cell_out((1, 5, 6, 9)),
+        6: cell_out((2, 6, 5, 7, 10)),
+        7: cell_out((3, 6, 7, 8, 11)),
+        8: cell_out((4, 7, 8, 12)),
+        9: cell_out((5, 9, 10, 13)),
+        10: cell_out((6, 9, 10, 11, 14)),
+        11: cell_out((7, 10, 11, 12, 14)),
+        12: cell_out((8, 11, 12, 15)),
+        13: cell_out((9, 13, 14)),
+        14: cell_out((10, 13, 14, 15)),
+        15: cell_out((11, 14, 15, 16)),
+        16: cell_out((12, 14, 15))
     }
 
     #cell_zero_c = []
