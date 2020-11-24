@@ -14,15 +14,15 @@ X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P13_t{t}"), Int(f"P14_t{t}"), Int(f"P15_t{t}"), Int(f"P16_t{t}")]]
      for t in range(BOARDS)]
 
-init_state = ((1, 0, 3, 4),
-              (5, 2, 7, 8),
+init_state = ((1, 2, 3, 4),
+              (5, 6, 7, 8),
               (9, 10, 11, 12),
-              (13, 14, 15, 6))
+              (13, 0, 14, 15))
 
 final_state = ((1, 2, 3, 4),
-               (5, 0, 7, 8),
+               (5, 6, 7, 8),
                (9, 10, 11, 12),
-               (13, 14, 15, 6))
+               (13, 14, 15, 0))
 
 current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
 
@@ -327,7 +327,7 @@ def g15():
     def cell_blank(tt, pos):
         return cell_x(tt, pos) == 0
 
-    def cell_fixed(tt, pos_list):
+    def cell_move_fixed(tt, pos_list):
         return And([cell_x(tt + 1, pos) == cell_x(tt, pos) for pos in pos_list])
 
     def cell_swap_x(tt, pos_t1, pos_t0):
@@ -362,6 +362,27 @@ def g15():
         16: {15: MOVE_RIGHT, 12: MOVE_DOWN}  # ok
     }
 
+    cell_fixed = {
+        # key = cell center
+        0: (),
+        1: (),
+        2: (),
+        3: (),
+        4: (),
+        5: (),
+        6: (),
+        7: (),
+        8: (),
+        9: (),
+        10: (),
+        11: (),
+        12: (),
+        13: (),
+        14: (16, 12, 11, 9, 8, 7, 6, 5, 4, 3, 2, 1),
+        15: (),
+        16: ()
+    }
+
     #cell_zero_c = []
     # for t in range(BOARDS - 1):
     #     # # quadrante SEE
@@ -388,9 +409,9 @@ def g15():
     #     # cell_zero_c.append(Implies(cell_blank(t + 1, 16),
     #     #                           cell_swap_move(t, MOVE_RIGHT, 16, 15),
     #     #                           ))
-    #     #cell_zero_c.append(cell_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    #     #cell_zero_c.append(cell_move_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     # t = 0
-    #cell_zero_c.append(cell_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+    #cell_zero_c.append(cell_move_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
     # cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
     #                        cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
     # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
@@ -412,12 +433,13 @@ def g15():
     # --> intorno di P16
     # cell_zero_c.append(Implies(And(cell_blank(t, pos=12), cell_x(t, pos=12) == cell_x(t + 1, pos=16)),
     #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_UP])))
-    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)),
+    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)2),
     #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_LEFT])))
     #
     # --> intorno di P
     cell_zero_c = []
-    for t in (0,):
+    for t in (0, ):
+        cell_zero_c.append(cell_move_fixed(t, pos_list=cell_fixed[14]))
         for cell_center in range(16):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
