@@ -447,7 +447,8 @@ def g15():
                 cell_move_from = cell_move[cell_center][cell]
                 cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
                                                cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
-                                               # TODO cercare la cella bianca e fissare tutte le altre
+                                               # TODO 1 cercare la cella bianca e fissare tutte le altre
+                                               # TODO 2 muovere una sola cella adiacente alla bianca
                                                cell_move_fixed(t, pos_list=cell_fixed[cell_center])),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
