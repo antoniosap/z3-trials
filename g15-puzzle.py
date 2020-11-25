@@ -6,7 +6,7 @@
 import tkinter as tk
 from z3 import *
 
-BOARDS = 2
+BOARDS = 3
 
 X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P5_t{t}"), Int(f"P6_t{t}"), Int(f"P7_t{t}"), Int(f"P8_t{t}")],
@@ -441,8 +441,8 @@ def g15():
     #
     # --> intorno di P
     cell_zero_c = []
-    for t in (0, ):
-        cell_zero_c.append(cell_move_fixed(t, pos_list=cell_fixed[14]))
+    for t in range(BOARDS - 1):
+        # cell_zero_c.append(cell_move_fixed(t, pos_list=cell_fixed[cell_center])) <------ ******
         for cell_center in range(16):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
