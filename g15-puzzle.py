@@ -442,11 +442,13 @@ def g15():
     # --> intorno di P
     cell_zero_c = []
     for t in range(BOARDS - 1):
-        # cell_zero_c.append(cell_move_fixed(t, pos_list=cell_fixed[cell_center])) <------ ******
         for cell_center in range(16):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
-                cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell)),
+                cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
+                                               cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
+                                               # TODO cercare la cella bianca e fissare tutte le altre
+                                               cell_move_fixed(t, pos_list=cell_fixed[cell_center])),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
