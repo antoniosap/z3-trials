@@ -328,13 +328,14 @@ def g15():
         return cell_x(tt, pos) == 0
 
     def cell_move_fixed(tt, pos_list):
+        # print(f"cell_move_fixed: t={tt} {pos_list}")
         return And([cell_x(tt + 1, pos) == cell_x(tt, pos) for pos in pos_list])
 
     def cell_swap_x(tt, pos_t1, pos_t0):
         return And(cell_x(tt + 1, pos_t1) == cell_x(tt, pos_t0), cell_x(tt + 1, pos_t0) == cell_x(tt, pos_t1))
 
     def cell_swap_move(tt, move_pos_name, pos_t1, pos_t0):
-        print(f"cell_swap_move: t={tt} if {op[tt]}=={move_pos_name} swap {pos_t1} {pos_t0}")
+        # print(f"cell_swap_move: t={tt} if {op[tt]}=={move_pos_name} swap {pos_t1} {pos_t0}")
         return Implies(op[tt] == move[move_pos_name], cell_swap_x(tt, pos_t1, pos_t0))
 
     def null_move(tt):
@@ -365,25 +366,46 @@ def g15():
     def cell_out(cell_list_in):
         return [c for c in [*range(1, 4*4+1)] if c not in cell_list_in]
 
+    cell_movable = {
+        # key = cell center
+        0: (),
+        1: (1, 2, 5),
+        2: (1, 2, 3, 6),
+        3: (2, 3, 4, 7),
+        4: (3, 4, 8),
+        5: (1, 5, 6, 9),
+        6: (2, 6, 5, 7, 10),
+        7: (3, 6, 7, 8, 11),
+        8: (4, 7, 8, 12),
+        9: (5, 9, 10, 13),
+        10: (6, 9, 10, 11, 14),
+        11: (7, 10, 11, 12, 14),
+        12: (8, 11, 12, 15),
+        13: (9, 13, 14),
+        14: (10, 13, 14, 15),
+        15: (11, 14, 15, 16),
+        16: (12, 14, 15)
+    }
+
     cell_fixed = {
         # key = cell center
         0: (),
-        1: cell_out((1, 2, 5)),
-        2: cell_out((1, 2, 3, 6)),
-        3: cell_out((2, 3, 4, 7)),
-        4: cell_out((3, 4, 8)),
-        5: cell_out((1, 5, 6, 9)),
-        6: cell_out((2, 6, 5, 7, 10)),
-        7: cell_out((3, 6, 7, 8, 11)),
-        8: cell_out((4, 7, 8, 12)),
-        9: cell_out((5, 9, 10, 13)),
-        10: cell_out((6, 9, 10, 11, 14)),
-        11: cell_out((7, 10, 11, 12, 14)),
-        12: cell_out((8, 11, 12, 15)),
-        13: cell_out((9, 13, 14)),
-        14: cell_out((10, 13, 14, 15)),
-        15: cell_out((11, 14, 15, 16)),
-        16: cell_out((12, 14, 15))
+        1: cell_out(cell_movable[1]),
+        2: cell_out(cell_movable[2]),
+        3: cell_out(cell_movable[3]),
+        4: cell_out(cell_movable[4]),
+        5: cell_out(cell_movable[5]),
+        6: cell_out(cell_movable[6]),
+        7: cell_out(cell_movable[7]),
+        8: cell_out(cell_movable[8]),
+        9: cell_out(cell_movable[9]),
+        10: cell_out(cell_movable[10]),
+        11: cell_out(cell_movable[11]),
+        12: cell_out(cell_movable[12]),
+        13: cell_out(cell_movable[13]),
+        14: cell_out(cell_movable[14]),
+        15: cell_out(cell_movable[15]),
+        16: cell_out(cell_movable[16])
     }
 
     #cell_zero_c = []
@@ -447,9 +469,10 @@ def g15():
                 cell_move_from = cell_move[cell_center][cell]
                 cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
                                                cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
-                                               # TODO 1 cercare la cella bianca e fissare tutte le altre
+                                               # cercare la cella bianca e fissare tutte le altre
+                                               cell_move_fixed(t, pos_list=cell_fixed[cell_center])
                                                # TODO 2 muovere una sola cella adiacente alla bianca
-                                               cell_move_fixed(t, pos_list=cell_fixed[cell_center])),
+                                               ),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
