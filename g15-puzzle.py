@@ -327,12 +327,19 @@ def g15():
     def cell_blank(tt, pos):
         return cell_x(tt, pos) == 0
 
-    def cell_move_fixed(tt, pos_list):
-        # print(f"cell_move_fixed: t={tt} {pos_list}")
-        return And([cell_x(tt + 1, pos) == cell_x(tt, pos) for pos in pos_list])
+    def cell_move_fixed(tt, cell_center):
+        # print(f"cell_move_fixed: t={tt} c={cell_center} {cell_fixed[cell_center]}")
+        return And([cell_x(tt + 1, pos) == cell_x(tt, pos) for pos in cell_fixed[cell_center]])
 
     def cell_swap_x(tt, pos_t1, pos_t0):
         return And(cell_x(tt + 1, pos_t1) == cell_x(tt, pos_t0), cell_x(tt + 1, pos_t0) == cell_x(tt, pos_t1))
+
+    def cell_move_only_one(tt, cell_center):
+        cell_neigh = []
+        for cell in cell_movable[cell_center]:
+            if cell != cell_center:
+                cell_neigh.append(cell_swap_x(tt, cell, cell_center))#
+        return AtMost(*cell_neigh, 1)
 
     def cell_swap_move(tt, move_pos_name, pos_t1, pos_t0):
         # print(f"cell_swap_move: t={tt} if {op[tt]}=={move_pos_name} swap {pos_t1} {pos_t0}")
@@ -464,15 +471,15 @@ def g15():
     # --> intorno di P
     cell_zero_c = []
     for t in range(BOARDS - 1):
-        for cell_center in range(16):
+        for cell_center in range(1, 16):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
                 cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
                                                cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
                                                # cercare la cella bianca e fissare tutte le altre
-                                               cell_move_fixed(t, pos_list=cell_fixed[cell_center])
-                                               # TODO 2 muovere una sola cella adiacente alla bianca
-                                               ),
+                                               cell_move_fixed(t, cell_center=cell_center),
+                                               # muovere una sola cella adiacente alla bianca
+                                               cell_move_only_one(t, cell_center)),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
