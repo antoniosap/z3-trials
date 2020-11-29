@@ -338,7 +338,7 @@ def g15():
         cell_neigh = []
         for cell in cell_movable[cell_center]:
             if cell != cell_center:
-                cell_neigh.append(cell_swap_x(tt, cell, cell_center))#
+                cell_neigh.append(cell_swap_x(tt, cell, cell_center))
         return AtMost(*cell_neigh, 1)
 
     def cell_swap_move(tt, move_pos_name, pos_t1, pos_t0):
@@ -471,15 +471,14 @@ def g15():
     # --> intorno di P
     cell_zero_c = []
     for t in range(BOARDS - 1):
-        for cell_center in range(1, 16):
+        cell_zero_c.append(op[t] != move[MOVE_NULL])
+        for cell_center in range(1, 4*4+1):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
                 cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
                                                cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
                                                # cercare la cella bianca e fissare tutte le altre
-                                               cell_move_fixed(t, cell_center=cell_center),
-                                               # muovere una sola cella adiacente alla bianca
-                                               cell_move_only_one(t, cell_center)),
+                                               cell_move_fixed(t, cell_center=cell_center)),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
     #
     # --> intorno di P13
@@ -487,14 +486,22 @@ def g15():
     # cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=14)),
     #                            And(cell_blank(t + 1, pos=14), op[t] == move[MOVE_LEFT])))
     #
-    cell_zero_c.append(op[t] != move[MOVE_NULL])
+
+    # muovere una sola cella ad ogni t
+    cell_move_one = []
+    for t in range(BOARDS - 1):
+        c = []
+        for cell in range(1, 4*4+1):
+            c.append(cell_x(t + 1, cell) != cell_x(t, cell))
+        cell_move_one.append(AtMost(*c, 2))
+        cell_move_one.append(AtLeast(*c, 2))
 
     s = Solver()
-    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c)
+    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c + cell_move_one)
     r = s.check()
     # print(s.assertions())
     # print(s.help())
-    # print(s.to_smt2())
+    print(s.to_smt2())
     # print(s.units())
     print(f"SOLUTION: {r}")
     if r == sat:
