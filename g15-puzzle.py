@@ -6,7 +6,7 @@
 import tkinter as tk
 from z3 import *
 
-BOARDS = 3
+BOARDS = 10
 
 X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P5_t{t}"), Int(f"P6_t{t}"), Int(f"P7_t{t}"), Int(f"P8_t{t}")],
@@ -14,17 +14,17 @@ X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P13_t{t}"), Int(f"P14_t{t}"), Int(f"P15_t{t}"), Int(f"P16_t{t}")]]
      for t in range(BOARDS)]
 
-init_state = ((1, 2, 3, 4),
-              (5, 6, 7, 8),
-              (9, 10, 11, 12),
-              (13, 0, 14, 15))
+init_state = ((5, 1, 2, 3),
+              (6, 7, 0, 4),
+              (9, 10, 11, 8),
+              (13, 14, 15, 12))
 
 final_state = ((1, 2, 3, 4),
                (5, 6, 7, 8),
                (9, 10, 11, 12),
                (13, 14, 15, 0))
 
-current_state = [[init_state[i][j] for j in range(4)] for i in range(4)]
+current_state = [[final_state[i][j] for j in range(4)] for i in range(4)]
 
 
 def g15():
@@ -415,59 +415,6 @@ def g15():
         16: cell_out(cell_movable[16])
     }
 
-    #cell_zero_c = []
-    # for t in range(BOARDS - 1):
-    #     # # quadrante SEE
-    #     #   t 1                   t 0  op 1           t 0  op 2
-    #     #   | 0  1  2  3          | 0  1  2  3        | 0  1  2  3
-    #     # --|-----------        --|-----------      --|-----------
-    #     # 0 | 1, 2, 3, 4        0 | 1, 2, 3, 4      0 | 1, 2, 3, 4
-    #     # 1 | 5, 6, 7, 8  <--   1 | 5, 6, 7, 8      1 | 5, 6, 7, 8
-    #     # 2 | 9,10,11,12        2 | 9,10,11,12      2 | 9,10,11,
-    #     # 3 |13,14,15,          3 |13,14,  ,15      3 |13,14,15,12
-    #     # cell_center = 16
-    #     # cell_zero_c.append(If(cell_x(t + 1, cell_center) == 0,
-    #     #                       AtMost(cell_swap_move(t, MOVE_LEFT, cell_center, cell_neighbors[cell_center][MOVE_LEFT]),
-    #     #                              cell_swap_move(t, MOVE_UP, cell_center, cell_neighbors[cell_center][MOVE_UP]),
-    #     #                              # null_move(t),
-    #     #                              1),
-    #     #                       True))
-    #     # cell_zero_c.append(Implies(cell_blank(t + 1, 16),
-    #     #                            AtMost(cell_swap_move(t, MOVE_LEFT, 16, 15),
-    #     #                                   cell_swap_move(t, MOVE_UP, 16, 12),
-    #     #                                   # null_move(t),
-    #     #                                   1),
-    #     #                            ))
-    #     # cell_zero_c.append(Implies(cell_blank(t + 1, 16),
-    #     #                           cell_swap_move(t, MOVE_RIGHT, 16, 15),
-    #     #                           ))
-    #     #cell_zero_c.append(cell_move_fixed(t, (14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
-    # t = 0
-    #cell_zero_c.append(cell_move_fixed(t, pos_list=(16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
-    # cell_zero_c.append(And(cell_x(t + 1, pos=14) == cell_x(t, pos=15),
-    #                        cell_x(t + 1, pos=15) == cell_x(t, pos=14)))
-    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
-    #                            cell_swap_move(t, MOVE_NULL, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
-    #                            cell_swap_move(t, MOVE_LEFT, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
-    #                            cell_swap_move(t, MOVE_UP, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(cell_blank(t+1, pos=14),
-    #                            cell_swap_move(t, MOVE_DOWN, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(cell_blank(t + 1, pos=14),
-    #                           cell_swap_move(t, MOVE_RIGHT, pos_t0=14, pos_t1=15)))
-    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), op[t] == move[MOVE_RIGHT]),
-    #                           cell_swap_x(t, pos_t0=15, pos_t1=14)))
-    # cell_zero_c.append(op[t] > move[MOVE_NULL])
-    # cell_zero_c.append(cell_blank(t+1, pos=14))
-    # cell_zero_c.append(Implies(cell_x(t, pos=14) == cell_x(t + 1, pos=15), op[t] == move[MOVE_RIGHT]))
-    # cell_zero_c.append(Implies(cell_x(t, pos=10) == cell_x(t + 1, pos=14), op[t] == move[MOVE_DOWN]))
-    # --> intorno di P16
-    # cell_zero_c.append(Implies(And(cell_blank(t, pos=12), cell_x(t, pos=12) == cell_x(t + 1, pos=16)),
-    #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_UP])))
-    # cell_zero_c.append(Implies(And(cell_blank(t, pos=15), cell_x(t, pos=15) == cell_x(t + 1, pos=16)2),
-    #                            And(cell_blank(t + 1, pos=16), op[t] == move[MOVE_LEFT])))
-    #
     # --> intorno di P
     cell_zero_c = []
     for t in range(BOARDS - 1):
@@ -480,14 +427,8 @@ def g15():
                                                # cercare la cella bianca e fissare tutte le altre
                                                cell_move_fixed(t, cell_center=cell_center)),
                                            And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
-    #
-    # --> intorno di P13
-    # cell_center = 13
-    # cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center), cell_x(t, pos=cell_center) == cell_x(t + 1, pos=14)),
-    #                            And(cell_blank(t + 1, pos=14), op[t] == move[MOVE_LEFT])))
-    #
 
-    # muovere una sola cella ad ogni t
+    # muovere una sola cella (cioè uno swap, quindi 2) ad ogni t
     cell_move_one = []
     for t in range(BOARDS - 1):
         c = []
@@ -501,7 +442,7 @@ def g15():
     r = s.check()
     # print(s.assertions())
     # print(s.help())
-    print(s.to_smt2())
+    # print(s.to_smt2())
     # print(s.units())
     print(f"SOLUTION: {r}")
     if r == sat:
@@ -678,24 +619,29 @@ class App(tk.Frame):
         g15_display(init_state)
         print(f"FINAL STATE t {BOARDS - 1}")
         g15_display(final_state)
+        self.planned_boards = 1
 
     def move_top(self):
-        print("MOVE TOP")
+        self.planned_boards += 1
+        print(f"MOVE TOP (set BOARDS to: {self.planned_boards})")
         g15_move_up(current_state)
         g15_display(current_state)
 
     def move_bottom(self):
-        print("MOVE BOTTOM")
+        self.planned_boards += 1
+        print(f"MOVE BOTTOM (set BOARDS to: {self.planned_boards})")
         g15_move_down(current_state)
         g15_display(current_state)
 
     def move_left(self):
-        print("MOVE LEFT")
+        self.planned_boards += 1
+        print(f"MOVE LEFT (set BOARDS to: {self.planned_boards})")
         g15_move_left(current_state)
         g15_display(current_state)
 
     def move_right(self):
-        print("MOVE RIGHT")
+        self.planned_boards += 1
+        print(f"MOVE RIGHT (set BOARDS to: {self.planned_boards})")
         g15_move_right(current_state)
         g15_display(current_state)
 
