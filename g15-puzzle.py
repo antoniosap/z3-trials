@@ -371,7 +371,7 @@ def g15():
     }
 
     def cell_out(cell_list_in):
-        return [c for c in [*range(1, 4*4+1)] if c not in cell_list_in]
+        return [c for c in [*range(1, 4 * 4 + 1)] if c not in cell_list_in]
 
     cell_movable = {
         # key = cell center
@@ -419,20 +419,24 @@ def g15():
     cell_zero_c = []
     for t in range(BOARDS - 1):
         cell_zero_c.append(op[t] != move[MOVE_NULL])
-        for cell_center in range(1, 4*4+1):
+        for cell_center in range(1, 4 * 4 + 1):
             for cell in cell_move[cell_center]:
                 cell_move_from = cell_move[cell_center][cell]
                 cell_zero_c.append(Implies(And(cell_blank(t, pos=cell_center),
                                                cell_x(t, pos=cell_center) == cell_x(t + 1, pos=cell),
                                                # cercare la cella bianca e fissare tutte le altre
-                                               cell_move_fixed(t, cell_center=cell_center)),
-                                           And(cell_blank(t + 1, pos=cell), op[t] == move[cell_move_from])))
+                                               cell_move_fixed(t, cell_center=cell_center)
+                                               ),
+                                           And(cell_blank(t + 1, pos=cell),
+                                               op[t] == move[cell_move_from])
+                                           )
+                                   )
 
     # muovere una sola cella (cioè uno swap, quindi 2) ad ogni t
     cell_move_one = []
     for t in range(BOARDS - 1):
         c = []
-        for cell in range(1, 4*4+1):
+        for cell in range(1, 4 * 4 + 1):
             c.append(cell_x(t + 1, cell) != cell_x(t, cell))
         cell_move_one.append(AtMost(*c, 2))
         cell_move_one.append(AtLeast(*c, 2))
