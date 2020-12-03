@@ -441,8 +441,16 @@ def g15():
         cell_move_one.append(AtMost(*c, 2))
         cell_move_one.append(AtLeast(*c, 2))
 
+    # la cella blank si deve spostare ad ogni board, non puo rimanere fissa
+    cell_blank_move_one = []
+    for t in range(BOARDS - 1):
+        c = []
+        for cell in range(1, 4 * 4 + 1):
+            c.append(Implies(cell_x(t, cell) == 0, cell_x(t + 1, cell) != 0))
+        cell_blank_move_one.append(And(*c))
+
     s = Solver()
-    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c + cell_move_one)
+    s.add(cells_c + distinct_c + init_state_c + final_state_c + fixed_c + cell_zero_c + op_c + cell_move_one + cell_blank_move_one)
     r = s.check()
     # print(s.assertions())
     # print(s.help())
