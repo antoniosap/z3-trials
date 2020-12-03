@@ -386,12 +386,12 @@ def g15():
         8: (4, 7, 8, 12),
         9: (5, 9, 10, 13),
         10: (6, 9, 10, 11, 14),
-        11: (7, 10, 11, 12, 14),
-        12: (8, 11, 12, 15),
+        11: (7, 10, 11, 12, 15),
+        12: (8, 11, 12, 16),
         13: (9, 13, 14),
         14: (10, 13, 14, 15),
         15: (11, 14, 15, 16),
-        16: (12, 14, 15)
+        16: (12, 15, 16)
     }
 
     cell_fixed = {
@@ -463,7 +463,11 @@ def g15():
         # print(m)
         print("BOARDS:")
         for t in range(BOARDS):
-            print(f"BOARD t {t}")
+            print(f"BOARD t {t}", end=" ")
+            if t < BOARDS - 1:
+                print(f"MOVE {move_name[int(str(m[op[t]]))]}")
+            else:
+                print()
             board = [[int(str(m.evaluate(X[t][i][j]))) for j in range(4)] for i in range(4)]
             g15_display(board)
         print("MOVES:")
