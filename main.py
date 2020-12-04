@@ -3,6 +3,42 @@
 from z3 import *
 
 
+def z3_trace():
+    z3.enable_trace('sat')
+    z3.enable_trace('goal')
+    z3.enable_trace('ackermannize')
+    z3.enable_trace('model_constructor')
+    z3.enable_trace('z3_replayer')
+    z3.enable_trace('algebraic2expr')
+    z3.enable_trace('pp_ast_dot_step')
+    z3.enable_trace('smt2_pp')
+    z3.enable_trace('pp_let')
+    z3.enable_trace('pp_scope')
+    z3.enable_trace('ast_translation')
+    z3.enable_trace('ast')
+    z3.enable_trace('mk_modus_ponens')
+    z3.enable_trace('mk_transitivity')
+    z3.enable_trace('distinct')
+    z3.enable_trace('unit_resolution')
+    z3.enable_trace('datatype')
+    z3.enable_trace('euf')
+    z3.enable_trace('nnf')
+    z3.enable_trace('pattern_inference')
+    z3.enable_trace('proof_checker')
+    z3.enable_trace('rewriter')
+    z3.enable_trace('seq')
+    z3.enable_trace('seq_verbose')
+    z3.enable_trace('unifier')
+    z3.enable_trace('grobner')
+    z3.enable_trace('dd.solver')
+    z3.enable_trace('grobner_d')
+    z3.enable_trace('nla_solver')
+    z3.enable_trace('model')
+    z3.enable_trace('opt')
+    z3.enable_trace('sat_tactic')
+    z3.enable_trace('model_checker')
+
+
 def sodoku():
     X = [[Int("x_%s_%s" % (i + 1, j + 1)) for j in range(9)]
          for i in range(9)]
@@ -205,8 +241,8 @@ def alphametics_gen():
 
     words = ['MERLO', 'PIPPA', 'VENDUTO', 'CIPPA', 'BACATO', 'PUPAZZO', 'PAGLIACCIO', 'BUFFONE', 'PINOCCHIO', 'FETENTE', 'PICIU', 'MONA',
              'CIUMMELLO', 'DRACULA', 'CORNUTO', 'ASSASSINO', 'PREZZOLATO', 'BARACCONE', 'PORCO', 'CUCCO', 'CANAGLIA', 'SEDANO', 'CARCIOFO',
-             'ZOZZONE', 'PIRLA', 'ZOCCOLA', 'ZIMBELLO', 'MERDACCIA', 'FINOCCHIO', 'BAVOSO', 'TRADITORE', 'INDEGNO',
-             'ALLUPATO', 'DROGATO', 'DELUCA']
+             'ZOZZONE', 'PIRLA', 'ZOCCOLA', 'ZIMBELLO', 'MERDACCIA', 'FINOCCHIO', 'BAVOSO', 'TRADITORE', 'INDEGNO', 'POLLASTRO',
+             'ALLUPATO', 'DROGATO', 'DPCMCONTE']
 
     words_total = len(words)
 
@@ -250,7 +286,11 @@ def alphametics_gen():
 
 
 if __name__ == '__main__':
+    print(f"Z3 version {z3.get_full_version()}")
     set_param('parallel.enable', True)
+    set_param('proof', False)
+    set_param(verbose=10)
+    z3_trace()
     # set_param(proof=True)
     # hanoi()
     alphametics_gen()
