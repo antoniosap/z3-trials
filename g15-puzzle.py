@@ -6,7 +6,9 @@
 import tkinter as tk
 from z3 import *
 
+MAX_BOARDS = 32
 BOARDS = 10
+
 
 X = [[[Int(f"P1_t{t}"), Int(f"P2_t{t}"), Int(f"P3_t{t}"), Int(f"P4_t{t}")],
       [Int(f"P5_t{t}"), Int(f"P6_t{t}"), Int(f"P7_t{t}"), Int(f"P8_t{t}")],
@@ -483,51 +485,7 @@ def g15():
         # print(s.proof())
 
 
-def move_null():
-    return []
-
-
-def move_down(board, row, col):
-    def move(board, row, col):
-        return [X[board - 1][row + 1][col] == X[board][row][col], X[board - 1][row][col] == 0]
-
-    if board > 0 and row < 3:
-        return [If(X[board - 1][row + 1][col] == 0, move(board, row, col), [])]
-    else:
-        return []
-
-
-def move_up(board, row, col):
-    def move(board, row, col):
-        return [X[board - 1][row - 1][col] == X[board][row][col], X[board - 1][row][col] == 0]
-
-    if board > 0 and row > 0:
-        return [If(X[board - 1][row - 1][col] == 0, move(board, row, col), [])]
-    else:
-        return []
-
-
-def move_left(board, row, col):
-    def move(board, row, col):
-        return [X[board - 1][row][col - 1] == X[board][row][col], X[board - 1][row][col] == 0]
-
-    if board > 0 and col > 0:
-        return [If(X[board - 1][row][col - 1] == 0, move(board, row, col), [])]
-    else:
-        return []
-
-
-def move_right(board, row, col):
-    def move(board, row, col):
-        return [X[board - 1][row][col + 1] == X[board][row][col], X[board - 1][row][col] == 0]
-
-    if board > 0 and col < 3:
-        return [If(X[board - 1][row][col + 1] == 0, move(board, row, col), [])]
-    else:
-        return []
-
-
-# ----------------------------------------------------------------------------------------------------
+# -- DISPLAY --------------------------------------------------------------------------------------------------
 
 def g15_display(s):
     print("|----|----|----|----|")
