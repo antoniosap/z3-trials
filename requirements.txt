@@ -1,3 +1,4 @@
-z3-solver
+# z3-solver dai sorgenti github
 angr
 monkeyhex
+# conda install -c conda-forge graph-tool
