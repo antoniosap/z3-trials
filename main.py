@@ -1,5 +1,6 @@
 # 23.9.2020
 
+from time import perf_counter
 from z3 import *
 
 
@@ -156,7 +157,7 @@ def hanoi():
 
 
 def alphametics():
-    set_param(proof=True)
+    t_start = perf_counter()
     # VIOLIN + VIOLIN + VIOLA = TRIO + SONATA
     A, I, L, N, O, R, S, T, V = Ints('A, I, L, N, O, R, S, T, V')
     s = Solver()
@@ -184,7 +185,51 @@ def alphametics():
         print(m)
         print(m[VIOLIN].as_long() + m[VIOLIN].as_long() + m[VIOLA].as_long())
         print(m[TRIO].as_long() + m[SONATA].as_long())
-        print(s.proof())
+        # print(s.proof())
+    t_delta = perf_counter() - t_start
+    print(f'search duration: {t_delta:.4f} second(s)')
+
+
+def alphametics_v2():
+    def lx(letter_chr):
+        return letters[ord(letter_chr) - ord('A')]
+
+    t_start = perf_counter()
+    # this table has 10 items, it reflects character for each number:
+    digits = [Int('digit_%d' % i) for i in range(10)]
+    # this is "reverse" table, it has value for each letter:
+    letters = [Int('letter_%s' % chr(i + ord('A'))) for i in range(26)]
+
+    s = Solver()
+
+    s.add(Distinct(lx('V'), lx('I'), lx('O'), lx('L'), lx('N'), lx('A'), lx('S'), lx('T'), lx('R')))
+    s.add(And(lx('A') >= 0, lx('A') <= 9))
+    s.add(And(lx('I') >= 0, lx('I') <= 9))
+    s.add(And(lx('L') >= 0, lx('L') <= 9))
+    s.add(And(lx('N') >= 0, lx('N') <= 9))
+    s.add(And(lx('O') >= 0, lx('O') <= 9))
+    s.add(And(lx('R') >= 0, lx('R') <= 9))
+    s.add(And(lx('S') >= 0, lx('S') <= 9))
+    s.add(And(lx('T') >= 0, lx('T') <= 9))
+    s.add(And(lx('V') >= 0, lx('V') <= 9))
+
+    VIOLIN, VIOLA, SONATA, TRIO = Ints('VIOLIN VIOLA SONATA TRIO')
+    s.add(VIOLIN == 100000 * lx('V') + 10000 * lx('I') + 1000 * lx('O') + 100 * lx('L') + 10 * lx('I') + lx('N'))
+    s.add(VIOLA == 10000 * lx('V') + 1000 * lx('I') + 100 * lx('O') + 10 * lx('L') + lx('A'))
+    s.add(SONATA == 100000 * lx('S') + 10000 * lx('O') + 1000 * lx('N') + 100 * lx('A') + 10 * lx('T') + lx('A'))
+    s.add(TRIO == 1000 * lx('T') + 100 * lx('R') + 10 * lx('I') + lx('O'))
+    s.add(VIOLIN + VIOLIN + VIOLA == TRIO + SONATA)
+    # solution
+    r = s.check()
+    print(r)
+    if r == sat:
+        m = s.model()
+        print(m)
+        print(m[VIOLIN].as_long() + m[VIOLIN].as_long() + m[VIOLA].as_long())
+        print(m[TRIO].as_long() + m[SONATA].as_long())
+        # print(s.proof())
+    t_delta = perf_counter() - t_start
+    print(f'search duration: {t_delta:.4f} second(s)')
 
 
 def char_to_idx(c):
@@ -211,7 +256,7 @@ def alphametics_gen():
     digits = [Int('digit_%d' % i) for i in range(10)]
 
     # this is "reverse" table, it has value for each letter:
-    letters = [Int('letter_%d' % i) for i in range(26)]
+    letters = [Int('letter_%s' % chr(i + ord('A'))) for i in range(26)]
 
     s = Solver()
 
@@ -293,5 +338,6 @@ if __name__ == '__main__':
     z3_trace()
     # set_param(proof=True)
     # hanoi()
-    alphametics_gen()
+    # alphametics_gen()
     # alphametics()
+    alphametics_v2()
